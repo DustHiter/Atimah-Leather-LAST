@@ -1,73 +1,69 @@
 <?php
-session_start();
-require_once __DIR__ . '/mail/MailService.php';
-
+session_start(); // Ensure session is started
 $page_title = 'تماس با ما';
-$page_description = 'با ما در تماس باشید. نظرات و پیشنهادات شما برای ما ارزشمند است.';
+require_once 'includes/header.php';
+require_once 'mail/MailService.php';
 
-$message = '';
-$error = '';
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_form'])) {
+    $name = trim(filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING));
+    $email = trim(filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL));
+    $message = trim(filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING));
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
-    $subject = trim($_POST['subject']);
-    $body = trim($_POST['message']);
-
-    if (empty($name) || empty($email) || empty($subject) || empty($body) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'لطفاً تمام فیلدها را به درستی پر کنید.';
+    if (empty($name) || empty($email) || empty($message)) {
+        $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'لطفاً تمام فیلدها را پر کنید.'];
+    } elseif (!$email) {
+        $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'آدرس ایمیل وارد شده معتبر نیست.'];
     } else {
-        $response = MailService::sendContactMessage($name, $email, $body, null, $subject);
-        if (!empty($response['success'])) {
-            $message = 'پیام شما با موفقیت ارسال شد. سپاسگزاریم!';
+        // Send email using MailService
+        $to_email = getenv('MAIL_TO') ?: 'your-default-email@example.com'; // Fallback email
+        $subject = "پیام جدید از فرم تماس وب‌سایت";
+
+        $email_result = MailService::sendContactMessage($name, $email, $message, $to_email, $subject);
+
+        if (!empty($email_result['success'])) {
+            $_SESSION['flash_message'] = ['type' => 'success', 'message' => 'پیام شما با موفقیت ارسال شد. سپاسگزاریم!'];
         } else {
-            $error = 'خطایی در ارسال پیام رخ داد. لطفاً بعداً تلاش کنید. متن خطا: ' . htmlspecialchars($response['error'] ?? 'Unknown error');
+            $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'خطا در ارسال پیام. لطفاً بعداً دوباره تلاش کنید.'];
+            error_log("MailService Error: " . ($email_result['error'] ?? 'Unknown error'));
         }
     }
+    
+    // Redirect to the same page to prevent form resubmission
+    header("Location: contact.php");
+    exit();
 }
 
-include 'includes/header.php';
+// Check for flash messages
+$flash_message = $_SESSION['flash_message'] ?? null;
+if ($flash_message) {
+    unset($_SESSION['flash_message']);
+}
 ?>
 
+<main class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8 text-center" data-aos="fade-up">
-            <h1 class="display-4 fw-bold"><?php echo $page_title; ?></h1>
-            <p class="lead text-white-50 mt-3"><?php echo $page_description; ?></p>
-        </div>
-    </div>
-
-    <div class="row justify-content-center mt-5">
         <div class="col-lg-8">
-            <div class="card border-0" style="background-color: var(--surface-color);">
-                <div class="card-body p-4 p-md-5">
-                    
-                    <?php if ($message): ?>
-                        <div class="alert alert-success" role="alert">
-                            <?php echo $message; ?>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger" role="alert">
-                            <?php echo $error; ?>
-                        </div>
-                    <?php endif; ?>
+            <div class="text-center mb-5" data-aos="fade-down">
+                <h1 class="display-4 fw-bold">ارتباط با ما</h1>
+                <p class="fs-5 text-muted">نظرات، پیشنهادات و سوالات شما برای ما ارزشمند است.</p>
+            </div>
 
-                    <form action="contact.php" method="POST" data-aos="fade-up" data-aos-delay="200">
+            <div class="card border-0 shadow-lg" data-aos="fade-up">
+                <div class="card-body p-4 p-md-5">
+                    <form action="contact.php" method="POST">
+                        <input type="hidden" name="contact_form">
                         <div class="mb-4">
                             <label for="name" class="form-label fs-5">نام شما</label>
-                            <input type="text" class="form-control form-control-lg bg-dark text-white" id="name" name="name" required>
+                            <input type="text" class="form-control form-control-lg bg-dark" id="name" name="name" required>
                         </div>
                         <div class="mb-4">
-                            <label for="email" class="form-label fs-5">ایمیل شما</label>
-                            <input type="email" class="form-control form-control-lg bg-dark text-white" id="email" name="email" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="subject" class="form-label fs-5">موضوع</label>
-                            <input type="text" class="form-control form-control-lg bg-dark text-white" id="subject" name="subject" required>
+                            <label for="email" class="form-label fs-5">ایمیل</label>
+                            <input type="email" class="form-control form-control-lg bg-dark" id="email" name="email" required>
                         </div>
                         <div class="mb-4">
                             <label for="message" class="form-label fs-5">پیام شما</label>
-                            <textarea class="form-control form-control-lg bg-dark text-white" id="message" name="message" rows="5" required></textarea>
+                            <textarea class="form-control form-control-lg bg-dark" id="message" name="message" rows="6" required></textarea>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">ارسال پیام</button>
@@ -75,8 +71,24 @@ include 'includes/header.php';
                     </form>
                 </div>
             </div>
-             <div class="alert alert-info mt-4"><b>توجه:</b> این فرم برای اهداف آزمایشی است. برای دریافت واقعی ایمیل‌ها، باید اطلاعات سرور ایمیل (SMTP) خود را در فایل <code>.env</code> وارد کنید.</div>
         </div>
     </div>
+</main>
 
-<?php include 'includes/footer.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    <?php if ($flash_message): ?>
+    Swal.fire({
+        title: '<?php echo $flash_message["type"] === "success" ? "موفق" : "خطا"; ?>',
+        text: '<?php echo addslashes($flash_message["message"]); ?>',
+        icon: '<?php echo $flash_message["type"]; ?>',
+        confirmButtonText: 'باشه',
+        background: '#2C2C2C',
+        color: '#D5D5D5'
+    });
+    <?php endif; ?>
+});
+</script>
+
+<?php require_once 'includes/footer.php'; ?>

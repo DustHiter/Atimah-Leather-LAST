@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="robots" content="noindex, nofollow">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/custom.css?v=<?php echo time(); ?>">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-dark text-white">
 
@@ -43,7 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h1 class="font-lalezar text-center mb-4">ورود به پنل</h1>
                      <p class="text-center text-muted mb-4">رمز عبور: admin123</p>
                     <?php if ($error): ?>
-                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-start',
+                                    icon: 'error',
+                                    title: '<?php echo $error; ?>',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    background: '#2C2C2C',
+                                    color: '#D5D5D5'
+                                });
+                            });
+                        </script>
                     <?php endif; ?>
                     <form method="POST">
                         <div class="mb-3">

@@ -1,121 +1,104 @@
 <?php
 session_start();
-require_once 'db/config.php';
-
-$cart_items_detailed = [];
-$total_price = 0;
-
-if (!empty($_SESSION['cart'])) {
-    $cart_item_ids = array_keys($_SESSION['cart']);
-    
-    // Extract pure product IDs from the composite key (e.g., '1-Black' -> '1')
-    $product_ids = array_map(function($id) {
-        return (int)explode('-', $id)[0];
-    }, $cart_item_ids);
-
-    if (!empty($product_ids)) {
-        $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-        
-        try {
-            $pdo = db();
-            $stmt = $pdo->prepare("SELECT id, name, price, image_url FROM products WHERE id IN ($placeholders)");
-            $stmt->execute(array_unique($product_ids));
-            $products_data = $stmt->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_UNIQUE);
-
-            foreach ($_SESSION['cart'] as $cart_item_id => $item) {
-                $product_id = (int)explode('-', $cart_item_id)[0];
-                
-                if (isset($products_data[$product_id])) {
-                    $product = $products_data[$product_id];
-                    $quantity = $item['quantity'];
-                    $color = $item['color'];
-                    $subtotal = $product['price'] * $quantity;
-                    $total_price += $subtotal;
-
-                    $cart_items_detailed[] = [
-                        'cart_item_id' => $cart_item_id,
-                        'product_id' => $product_id,
-                        'name' => $product['name'],
-                        'price' => $product['price'],
-                        'image_url' => $product['image_url'],
-                        'quantity' => $quantity,
-                        'color' => $color,
-                        'subtotal' => $subtotal
-                    ];
-                }
-            }
-        } catch (PDOException $e) {
-            error_log("DB Error: " . $e->getMessage());
-            $cart_items_detailed = [];
-            $total_price = 0;
-        }
-    }
-}
-
 $page_title = 'سبد خرید';
-include 'includes/header.php';
+require_once 'includes/header.php';
+
+$cart_items = $_SESSION['cart'] ?? [];
+$total_price = 0;
 ?>
 
-<div class="text-center mb-5">
-    <h1 class="display-4 fw-bold">سبد خرید شما</h1>
+<div class="cart-page-wrapper">
+    <div class="container">
+
+        <?php if (empty($cart_items)): ?>
+            <div class="empty-cart-container">
+                <i class="ri-shopping-cart-line"></i>
+                <h2>سبد خرید شما خالی است</h2>
+                <p>به نظر می‌رسد هنوز محصولی به سبد خرید خود اضافه نکرده‌اید. همین حالا گشتی در فروشگاه بزنید.</p>
+                <a href="shop.php" class="btn btn-primary btn-lg btn-checkout">
+                    <i class="ri-store-2-line me-2"></i>
+                    رفتن به فروشگاه
+                </a>
+            </div>
+        <?php else: ?>
+            <div class="text-center mb-5">
+                <h1 class="fw-bold display-5">سبد خرید شما</h1>
+                <p class="text-white-50 fs-5">جزئیات سفارش خود را بررسی و نهایی کنید.</p>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <?php foreach ($cart_items as $item_id => $item): 
+                        $item_total = $item['price'] * $item['quantity'];
+                        $total_price += $item_total;
+                    ?>
+                        <div class="cart-item-card">
+                             <div class="remove-item-btn">
+                                <form action="cart_handler.php" method="POST" class="d-inline">
+                                    <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+                                    <input type="hidden" name="product_color" value="<?php echo htmlspecialchars($item['color'] ?? ''); ?>">
+                                    <input type="hidden" name="action" value="remove">
+                                    <button type="submit" class="btn btn-link text-decoration-none p-0"><i class="ri-close-circle-line"></i></button>
+                                </form>
+                            </div>
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-2 col-3 cart-item-image">
+                                    <a href="product.php?id=<?php echo $item['product_id']; ?>">
+                                        <img src="<?php echo htmlspecialchars($item['image_url']); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                                    </a>
+                                </div>
+                                <div class="col-md-4 col-9 cart-item-details">
+                                    <h5><a href="product.php?id=<?php echo $item['product_id']; ?>"><?php echo htmlspecialchars($item['name']); ?></a></h5>
+                                    <?php if (!empty($item['color'])): ?>
+                                        <div class="d-flex align-items-center">
+                                            <small class="text-white-50 me-2">رنگ:</small>
+                                            <span class="d-inline-block rounded-circle border" style="width: 20px; height: 20px; background-color: <?php echo htmlspecialchars($item['color']); ?>;"></span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-3 col-7">
+                                    <form action="cart_handler.php" method="POST" class="quantity-selector">
+                                        <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+                                        <input type="hidden" name="product_color" value="<?php echo htmlspecialchars($item['color'] ?? ''); ?>">
+                                        <input type="hidden" name="action" value="update">
+                                        
+                                        <button type="submit" name="quantity" value="<?php echo $item['quantity'] + 1; ?>" class="btn">+</button>
+                                        <input type="text" value="<?php echo $item['quantity']; ?>" class="quantity-input" readonly>
+                                        <button type="submit" name="quantity" value="<?php echo $item['quantity'] - 1; ?>" class="btn" <?php echo $item['quantity'] <= 1 ? 'disabled' : ''; ?>>-</button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3 col-5 text-end">
+                                    <span class="item-price"><?php echo number_format($item_total); ?> <small>تومان</small></span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="order-summary-card">
+                        <h4 class="card-title">خلاصه سفارش</h4>
+                        <div class="summary-item">
+                            <span class="label">جمع کل</span>
+                            <span class="value"><?php echo number_format($total_price); ?> تومان</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">هزینه ارسال</span>
+                            <span class="value text-success">رایگان</span>
+                        </div>
+                        <div class="summary-total">
+                             <div class="summary-item">
+                                <span class="label">مبلغ نهایی</span>
+                                <span class="value"><?php echo number_format($total_price); ?> تومان</span>
+                            </div>
+                        </div>
+                        <div class="d-grid mt-4">
+                            <a href="checkout.php" class="btn btn-primary btn-lg btn-checkout">ادامه و پرداخت</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
-<?php if (empty($cart_items_detailed)): ?>
-    <div class="text-center p-5 bg-light rounded-3">
-        <p class="lead">سبد خرید شما خالی است.</p>
-        <a href="shop.php" class="btn btn-primary">بازگشت به فروشگاه</a>
-    </div>
-<?php else: ?>
-    <form action="cart_handler.php" method="POST">
-        <input type="hidden" name="update_cart" value="1">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col" colspan="2">محصول</th>
-                        <th scope="col" class="text-center">قیمت</th>
-                        <th scope="col" class="text-center">تعداد</th>
-                        <th scope="col" class="text-end">جمع کل</th>
-                        <th scope="col" class="text-center">حذف</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($cart_items_detailed as $item): ?>
-                        <tr>
-                            <td style="width: 100px;">
-                                <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="img-fluid rounded-3">
-                            </td>
-                            <td>
-                                <h5 class="mb-0"><?php echo htmlspecialchars($item['name']); ?></h5>
-                                <?php if ($item['color']): ?>
-                                    <small class="text-muted">رنگ: <?php echo htmlspecialchars($item['color']); ?></small>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center"><strong><?php echo number_format($item['price']); ?></strong></td>
-                            <td class="text-center" style="width: 120px;">
-                                <input type="number" class="form-control text-center" name="quantities[<?php echo $item['cart_item_id']; ?>]" value="<?php echo $item['quantity']; ?>" min="1" max="10">
-                            </td>
-                            <td class="text-end"><strong><?php echo number_format($item['subtotal']); ?></strong></td>
-                            <td class="text-center">
-                                <a href="cart_handler.php?action=remove&id=<?php echo $item['cart_item_id']; ?>" class="btn btn-sm btn-outline-danger">&times;</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
-            <button type="submit" class="btn btn-outline-secondary">به‌روزرسانی سبد</button>
-            <div class="text-end">
-                <h4>جمع نهایی: <span class="fw-bold text-primary"><?php echo number_format($total_price); ?> تومان</span></h4>
-            </div>
-        </div>
-    </form>
-
-    <div class="text-center mt-5">
-        <a href="checkout.php" class="btn btn-primary btn-lg">ادامه جهت تسویه حساب</a>
-    </div>
-<?php endif; ?>
-
-<?php include 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>

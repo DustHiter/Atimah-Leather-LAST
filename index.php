@@ -22,9 +22,19 @@ include 'includes/header.php';
         <!-- Featured Products Section -->
         <section id="featured-products" class="py-5">
             <div class="container">
+                <?php
+                if (isset($_SESSION['success_message'])) {
+                    echo '<div class="alert alert-success alert-dismissible fade show" role="alert">' . $_SESSION['success_message'] . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                    unset($_SESSION['success_message']);
+                }
+                if (isset($_SESSION['error_message'])) {
+                    echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">' . $_SESSION['error_message'] . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+                    unset($_SESSION['error_message']);
+                }
+                ?>
                 <div class="text-center mb-5" data-aos="fade-up">
                     <h2 class="display-5 fw-bold">مجموعه برگزیده ما</h2>
-                    <p class="text-muted fs-5">دست‌چین شده برای سلیقه‌های خاص.</p>
+                    <p class="fs-5">دست‌چین شده برای سلیقه‌های خاص.</p>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 g-lg-5">
                     <?php

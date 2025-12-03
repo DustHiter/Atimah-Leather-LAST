@@ -1,38 +1,22 @@
 /*
-:root variables for the default Light Theme
+Default Dark Theme Variables.
+Light theme has been removed.
 */
 :root {
-    --primary-color: #8B4513; /* SaddleBrown */
-    --secondary-color: #D2B48C; /* Tan */
-    --accent-color: #C0A080;
-    --background-color: #FDFBF7;
-    --surface-color: #FFFFFF; /* For cards, headers, etc. */
-    --text-color: #4A4A4A;
-    --heading-color: #2F2F2F;
-    --border-color: #EAEAEA;
-    --footer-bg: #2C2C2C;
-    --white-color: #FFFFFF;
-
-    --font-family-sans-serif: 'Montserrat', sans-serif;
-    --body-font: 'Montserrat', sans-serif;
-}
-
-/*
-Variables for the Dark Theme
-We will apply these by adding a class="dark" to the <html> tag
-*/
-html.dark {
     --primary-color: #C0A080; /* Lighter tan for accents in dark mode */
     --secondary-color: #8B4513; /* Darker brown */
     --accent-color: #D2B48C;
     --background-color: #1A1A1A; /* Very dark grey, almost black */
     --surface-color: #2C2C2C; /* Dark grey for cards and surfaces */
-    --text-color: #D5D5D5; /* Light grey for body text */
+    --text-color: #EAEAEA; /* Brighter grey for better readability */
     --heading-color: #FFFFFF; /* White for headings */
     --border-color: #444444; /* Grey for borders */
     --footer-bg: #111111; /* Even darker for footer */
-}
+    --white-color: #FFFFFF;
 
+    --font-family-sans-serif: 'Vazirmatn', sans-serif;
+    --body-font: 'Vazirmatn', sans-serif;
+}
 
 body {
     font-family: var(--body-font);
@@ -64,16 +48,12 @@ a:hover {
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    color: var(--background-color); /* To have contrast in both themes */
+    color: var(--heading-color);
     padding: 12px 30px;
     font-weight: 600;
     border-radius: 50px;
     transition: all 0.3s ease-in-out;
 }
-html.dark .btn-primary {
-    color: var(--heading-color);
-}
-
 
 .btn-primary:hover, .btn-primary:focus {
     background-color: var(--secondary-color);
@@ -91,22 +71,18 @@ html.dark .btn-primary {
 }
 .btn-outline-primary:hover {
     background-color: var(--primary-color);
-    color: var(--white-color);
+    color: var(--heading-color);
 }
 
 /* --- Header --- */
 .site-header {
     background-color: var(--surface-color);
-    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.2);
     border-bottom: 1px solid var(--border-color);
     transition: background-color 0.3s ease;
     position: sticky;
     top: 0;
     z-index: 1020;
-}
-
-html.dark .site-header {
-     box-shadow: 0 2px 15px rgba(0,0,0,0.2);
 }
 
 .site-header .nav-link,
@@ -125,13 +101,8 @@ html.dark .site-header {
 
 .site-header .badge {
     background-color: var(--primary-color) !important;
-    color: var(--background-color) !important;
-}
-
-html.dark .site-header .badge {
     color: var(--heading-color) !important;
 }
-
 
 /* --- Footer --- */
 .site-footer {
@@ -158,22 +129,13 @@ html.dark .site-header .badge {
     border-radius: 15px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.04);
-}
-
-html.dark .product-card {
     box-shadow: 0 5px 20px rgba(0,0,0,0.15);
 }
 
 .product-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-}
-
-html.dark .product-card:hover {
     box-shadow: 0 15px 30px rgba(0,0,0,0.25);
 }
-
 
 .product-card .product-image img {
     transition: transform 0.5s ease;
@@ -217,13 +179,7 @@ html.dark .product-card:hover {
     box-shadow: 0 0 0 3px var(--surface-color), 0 0 0 5px var(--primary-color);
 }
 
-/* Handle specific colors that need border in light mode */
-.color-swatches [style*="#FFFFFF"] + label,
-.color-swatches [style*="#ffffff"] + label {
-    border-color: #dedede;
-}
-
-html.dark .color-swatches [style*="#000000"] + label {
+.color-swatches [style*="#000000"] + label {
      border-color: #555;
 }
 
@@ -264,7 +220,6 @@ html.dark .color-swatches [style*="#000000"] + label {
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
 
-
     /* About Us Mobile */
     #about-us .display-5 {
         font-size: 2rem;
@@ -291,26 +246,31 @@ html.dark .color-swatches [style*="#000000"] + label {
     .site-footer .col-lg-2, .site-footer .col-lg-3, .site-footer .col-lg-4 {
         margin-bottom: 30px;
     }
+
+    /* Center flex items in the footer on mobile */
+    .site-footer .d-flex {
+        justify-content: center;
+    }
 }
 
 /* --- Header Icon Fixes for Dark Mode --- */
 
 /* Ensure theme toggle and other header buttons are visible in dark mode */
-html.dark .site-header .btn {
-    color: var(--text-color); /* Use the light text color from dark theme variables */
+.site-header .btn {
+    color: var(--text-color);
 }
 
-html.dark .site-header .btn:hover {
-    color: var(--primary-color); /* Use a hover color */
+.site-header .btn:hover {
+    color: var(--primary-color);
 }
 
 /* Fix for bootstrap's default hamburger icon in dark mode */
-html.dark .navbar-toggler-icon {
+.navbar-toggler-icon {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 /* Fix for the border color of the toggler button itself */
-html.dark .navbar-toggler {
+.navbar-toggler {
     border-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -322,8 +282,8 @@ html.dark .navbar-toggler {
 
 /* --- Custom Gold Button --- */
 .btn-outline-gold {
-    border-color: #D4AF37; /* Gold */
-    color: #D4AF37;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
     padding: 12px 30px;
     font-weight: 600;
     border-radius: 50px;
@@ -331,19 +291,10 @@ html.dark .navbar-toggler {
 }
 
 .btn-outline-gold:hover {
-    background-color: #D4AF37;
-    color: var(--white-color);
-}
-
-html.dark .btn-outline-gold {
-    border-color: var(--accent-color);
-    color: var(--accent-color);
-}
-
-html.dark .btn-outline-gold:hover {
     background-color: var(--accent-color);
     color: var(--heading-color);
 }
+
 
 /* --- Hero Section Text --- */
 .hero-section {
@@ -368,10 +319,514 @@ html.dark .btn-outline-gold:hover {
     text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
-/* --- About Us Section Text Color Fix for Dark Mode --- */
-html.dark #about-us h2,
-html.dark #about-us p {
-    color: var(--heading-color) !important; /* Use a light, readable color */
+/* --- About Us Section Text Color Fix --- */
+#about-us p {
+    color: var(--text-color) !important;
 }
 
 
+/* --- Footer Social Icons --- */
+.social-icon {
+    font-size: 1.5rem; /* Larger icons */
+    transition: all 0.3s ease;
+    display: inline-block; /* Needed for transform */
+    color: #AFAFAF !important; /* Default icon color from footer */
+}
+
+.social-icon:hover {
+    transform: translateY(-3px) scale(1.1); /* Lift and grow effect */
+}
+
+/* Brand Colors on Hover */
+.social-icon.bi-instagram:hover { color: #E4405F !important; }
+.social-icon.bi-telegram:hover { color: #26A5E4 !important; }
+.social-icon.bi-whatsapp:hover { color: #25D366 !important; }
+
+/* --- Admin Panel Sidebar --- */
+body.admin-page {
+    padding-right: 260px; /* Make space for the sidebar */
+    transition: padding-right 0.3s ease;
+}
+
+.admin-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 260px;
+    z-index: 1030;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+}
+
+.admin-sidebar h3 {
+    font-family: 'Lalezar', cursive;
+    font-size: 1.5rem;
+}
+
+.admin-sidebar .nav-link {
+    color: var(--text-color);
+    font-size: 1.05rem;
+    padding: 15px 25px;
+    border-right: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.admin-sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-right-color: var(--accent-color);
+    color: var(--white-color);
+}
+
+.admin-sidebar .nav-link.active {
+    background-color: var(--primary-color);
+    color: var(--heading-color);
+    border-right-color: var(--accent-color);
+    font-weight: 700;
+}
+
+.admin-sidebar .sidebar-footer {
+    margin-top: auto;
+    padding: 25px;
+    border-top: 1px solid var(--border-color);
+}
+
+.admin-main-content {
+    padding: 2rem;
+}
+
+/* Responsive Admin Layout */
+@media (max-width: 992px) {
+    body.admin-page {
+        padding-right: 0;
+    }
+    .admin-sidebar {
+        right: -260px; /* Hide sidebar off-screen */
+    }
+    .admin-main-content {
+        padding: 1rem;
+    }
+    /* We'll need a hamburger menu button to toggle the sidebar on mobile */
+}
+
+/*--------------------------------------------------------------
+# Shopping Cart Page (Dark Theme)
+--------------------------------------------------------------*/
+.cart-page-wrapper {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.cart-item-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: box-shadow 0.3s ease;
+    position: relative;
+}
+
+.cart-item-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.cart-item-image img {
+    border-radius: 8px;
+}
+
+.cart-item-details h5 a {
+    font-weight: 600;
+    color: var(--heading-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.cart-item-details h5 a:hover {
+    color: var(--primary-color);
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    padding: 5px;
+    max-width: 120px;
+}
+
+.quantity-selector .btn {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.quantity-selector .btn:hover {
+    background-color: var(--primary-color);
+    color: var(--heading-color);
+    border-color: var(--primary-color);
+}
+
+.quantity-selector .quantity-input {
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    color: var(--heading-color);
+    width: 40px;
+    text-align: center;
+}
+
+.item-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.remove-item-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+.remove-item-btn .btn {
+    color: #888;
+    font-size: 1.2rem;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.remove-item-btn .btn:hover {
+    color: #e74c3c;
+}
+
+/* Order Summary Card */
+.order-summary-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    position: sticky;
+    top: 120px;
+}
+
+.order-summary-card .card-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.summary-item .label {
+    color: #aaa;
+}
+
+.summary-item .value {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.summary-total {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.summary-total .label {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--heading-color);
+}
+
+.summary-total .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.btn-checkout {
+    padding: 14px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 8px;
+}
+
+/* Empty Cart */
+.empty-cart-container {
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 4rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.empty-cart-container .ri-shopping-cart-line {
+    font-size: 5rem;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.empty-cart-container h2 {
+    font-weight: 700;
+    margin-top: 1.5rem;
+    color: var(--heading-color);
+}
+
+.empty-cart-container p {
+    max-width: 400px;
+    margin: 1rem auto 2rem auto;
+    color: #aaa;
+}
+
+/*--------------------------------------------------------------
+# Checkout Page (Dark Theme)
+--------------------------------------------------------------*/
+.checkout-form-section {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2.5rem;
+}
+
+@media (max-width: 991.98px) {
+    .checkout-form-section {
+        padding: 1.5rem;
+    }
+}
+
+.checkout-form-section h4 {
+    font-weight: 700;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group .form-control {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    padding: 12px 20px;
+    height: 52px;
+    transition: all 0.3s ease;
+}
+
+.form-group .form-control:focus {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(192, 160, 128, 0.2);
+}
+
+.form-group textarea.form-control {
+    height: auto;
+}
+
+.form-text-info {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent-color) !important;
+    opacity: 0.9;
+}
+
+/* Address Cards */
+.address-card-selector .address-card {
+    background: var(--background-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    height: 100%;
+}
+
+.address-card-selector .address-card:hover {
+    border-color: var(--primary-color);
+}
+
+.address-card-selector .address-card.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(192, 160, 128, 0.3);
+}
+
+.address-card-selector .form-check-input {
+    width: 1.5em;
+    height: 1.5em;
+    margin-top: 0.2em;
+}
+
+.address-card-title {
+    font-weight: 600;
+    color: var(--heading-color);
+    margin-bottom: 0.5rem;
+}
+
+.address-card-detail {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.address-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+#new-address-form-wrapper {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+}
+
+/* Checkout Summary */
+.checkout-summary-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    position: sticky;
+    top: 120px;
+}
+
+.checkout-summary-card .list-group-item {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-color);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.checkout-summary-card .summary-title {
+     font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.secure-payment-info {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.secure-payment-info i {
+    color: #28a745;
+}
+
+.form-check-label a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.form-check-label a:hover {
+    text-decoration: underline;
+}
+
+/*================================================
+# Checkout & Auth Page Dark Theme REFINEMENTS
+================================================*/
+
+/* General text & label color fix */
+body.bg-dark, .bg-dark, .checkout-form-section, .login-form-section {
+    /* Make sure all labels and general text are readable */
+    .form-label, label {
+        color: #EAEAEA !important; /* Use a bright, readable color */
+        opacity: 0.9;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+    }
+    .text-muted {
+        color: #a0a0a0 !important; /* A lighter muted color for dark bg */
+    }
+}
+
+
+/* Improved Form Control Styles */
+.form-control.bg-dark, .form-select.bg-dark {
+    color: var(--text-color) !important;
+    background-color: #1c1c1c !important; /* Slightly lighter than main bg */
+    border: 1px solid #4a4a4a;
+    border-radius: 8px;
+    height: 50px;
+    transition: all 0.3s ease;
+}
+
+.form-control.bg-dark:focus, .form-select.bg-dark:focus {
+    background-color: #1c1c1c !important;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(192, 160, 128, 0.25);
+}
+
+textarea.form-control.bg-dark {
+    height: auto;
+}
+
+/* Style for the select dropdown arrow */
+.form-select.bg-dark {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d2b48c' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* Checkbox styles */
+.form-check-input {
+    background-color: #333;
+    border: 1px solid #555;
+}
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.form-check-input:focus {
+     box-shadow: 0 0 0 3px rgba(192, 160, 128, 0.25);
+}
+.form-check-label {
+    color: #ccc;
+}
+.form-check-label a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+.form-check-label a:hover {
+    text-decoration: underline;
+}
+
+/* Order Summary Card Refinements */
+.list-group-item.bg-dark {
+    border-color: #444 !important; /* Darker border for list items */
+}
+
+hr {
+    border-top-color: #444;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-primary.btn-lg {
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}

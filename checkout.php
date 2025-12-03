@@ -2,173 +2,194 @@
 session_start();
 require_once 'db/config.php';
 
-// If cart is empty, redirect to shop page, there is nothing to checkout
+// Redirect if cart is empty
 if (empty($_SESSION['cart'])) {
     header('Location: shop.php');
     exit;
 }
 
-$p_title = "تسویه حساب";
-$order_placed_successfully = false;
-$error_message = '';
+$cart_items = $_SESSION['cart'];
+$total_price = array_reduce($cart_items, function ($sum, $item) {
+    return $sum + ($item['price'] * $item['quantity']);
+}, 0);
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // --- Data Validation ---
-    $name = trim($_POST['customer_name'] ?? '');
-    $email = trim($_POST['customer_email'] ?? '');
-    $address = trim($_POST['customer_address'] ?? '');
+// User and address data
+$logged_in_user = null;
+$user_addresses = [];
+$is_logged_in = isset($_SESSION['user_id']);
 
-    if (empty($name) || empty($email) || empty($address)) {
-        $error_message = 'لطفاً تمام فیلدها را پر کنید.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error_message = 'لطفاً یک آدرس ایمیل معتبر وارد کنید.';
-    }
-    
-    if(empty($error_message)) {
+if ($is_logged_in) {
+    try {
         $pdo = db();
-        try {
-            // --- Server-side recalculation of total ---
-            $product_ids = array_keys($_SESSION['cart']);
-            $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-            $stmt = $pdo->prepare("SELECT id, price FROM products WHERE id IN ($placeholders)");
-            $stmt->execute($product_ids);
-            $products_from_db = $stmt->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_UNIQUE);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $logged_in_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $total_amount = 0;
-            foreach ($_SESSION['cart'] as $product_id => $quantity) {
-                if(isset($products_from_db[$product_id])){
-                    $total_amount += $products_from_db[$product_id]['price'] * $quantity;
-                }
-            }
-            
-            // --- Database Transaction ---
-            $pdo->beginTransaction();
-
-            // 1. Insert into orders table
-            $sql_order = "INSERT INTO orders (customer_name, customer_email, customer_address, total_amount) VALUES (?, ?, ?, ?)";
-            $stmt_order = $pdo->prepare($sql_order);
-            $stmt_order->execute([$name, $email, $address, $total_amount]);
-            $order_id = $pdo->lastInsertId();
-
-            // 2. Insert into order_items table
-            $sql_items = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
-            $stmt_items = $pdo->prepare($sql_items);
-            
-            foreach ($_SESSION['cart'] as $product_id => $quantity) {
-                if(isset($products_from_db[$product_id])){
-                     $price = $products_from_db[$product_id]['price'];
-                     $stmt_items->execute([$order_id, $product_id, $quantity, $price]);
-                }
-            }
-            
-            // 3. Commit the transaction
-            $pdo->commit();
-
-            // 4. Clear the cart and set success flag
-            unset($_SESSION['cart']);
-            $order_placed_successfully = true;
-            $p_title = "سفارش شما ثبت شد";
-
-        } catch (Exception $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            error_log("Checkout Error: " . $e->getMessage());
-            $error_message = 'مشکلی در ثبت سفارش شما به وجود آمد. لطفاً دوباره تلاش کنید.';
-        }
+        $stmt = $pdo->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user_addresses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // In a real app, log this error
+        die("Error fetching user data.");
     }
 }
 
+$page_title = 'تکمیل سفارش';
+require_once 'includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $p_title; ?> - چرم آتیمه</title>
-    <meta name="robots" content="noindex, nofollow">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500&family=Lalezar&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/custom.css?v=<?php echo time(); ?>">
-</head>
-<body class="bg-dark text-white">
 
-    <!-- Header -->
-    <header class="p-3 mb-3 border-bottom border-secondary">
-        <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a href="index.php" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                     <h1 class="font-playfair fs-2" style="color: #D4AF37;">آتیمه</h1>
-                </a>
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="index.php" class="nav-link px-2 text-white">خانه</a></li>
-                    <li><a href="shop.php" class="nav-link px-2 text-white">فروشگاه</a></li>
-                </ul>
-                <div class="text-end">
-                     <a href="cart.php" class="btn btn-outline-warning position-relative">
-                        سبد خرید
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                           <?php echo count($_SESSION['cart'] ?? []); ?>
-                        </span>
-                    </a>
+<div class="container my-5 bg-dark text-light">
+    <?php
+    if (isset($_SESSION['error_message'])) {
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">' . htmlspecialchars($_SESSION['error_message']) . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        unset($_SESSION['error_message']);
+    }
+    ?>
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">تکمیل فرآیند خرید</h1>
+        <p class="text-muted">فقط یک قدم دیگر تا نهایی شدن سفارش شما باقیست.</p>
+    </div>
+
+    <form action="checkout_handler.php" method="POST">
+        <div class="row g-5">
+            <!-- Shipping Details -->
+            <div class="col-lg-7">
+                <h3 class="mb-4">اطلاعات ارسال</h3>
+
+                <?php if ($is_logged_in && !empty($user_addresses)): ?>
+                    <div class="mb-4">
+                        <label for="saved_address" class="form-label">انتخاب آدرس</label>
+                        <select class="form-select bg-dark text-light" id="saved_address">
+                            <option value="">یک آدرس انتخاب کنید یا فرم زیر را پر کنید...</option>
+                            <?php foreach ($user_addresses as $addr): ?>
+                                <option value='<?php echo json_encode($addr, JSON_HEX_APOS | JSON_HEX_QUOT); ?>'>
+                                    <?php echo htmlspecialchars($addr['province'] . '، ' . $addr['city'] . '، ' . $addr['address_line']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
+
+                <div class="card bg-dark border-secondary shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">نام</label>
+                                <input type="text" class="form-control bg-dark text-light" id="first_name" name="first_name" value="<?php echo htmlspecialchars($logged_in_user['first_name'] ?? ''); ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">نام خانوادگی</label>
+                                <input type="text" class="form-control bg-dark text-light" id="last_name" name="last_name" value="<?php echo htmlspecialchars($logged_in_user['last_name'] ?? ''); ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone_number" class="form-label">تلفن همراه</label>
+                                <input type="tel" class="form-control bg-dark text-light" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($logged_in_user['phone_number'] ?? ''); ?>" required>
+                                <?php if (!$is_logged_in): ?>
+                                    <div class="form-text text-info fw-bold">توجه: فقط با شماره تلفن همراه میتوان سفارش را رهگیری کرد.</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="province" class="form-label">استان</label>
+                                <input type="text" class="form-control bg-dark text-light" id="province" name="province" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">شهر</label>
+                                <input type="text" class="form-control bg-dark text-light" id="city" name="city" required>
+                            </div>
+                             <div class="col-md-6">
+                                <label for="address_line" class="form-label">آدرس دقیق</label>
+                                <textarea class="form-control bg-dark text-light" id="address_line" name="address_line" rows="2" required></textarea>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="postal_code" class="form-label">کد پستی</label>
+                                <input type="text" class="form-control bg-dark text-light" id="postal_code" name="postal_code" required>
+                            </div>
+                            <div class="col-md-7">
+                                <label for="email" class="form-label">ایمیل (اختیاری)</label>
+                                <input type="email" class="form-control bg-dark text-light" id="email" name="email" value="<?php echo htmlspecialchars($logged_in_user['email'] ?? ''); ?>">
+                            </div>
+                        </div>
+                         <div class="form-check mt-4">
+                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                با <a href="#">قوانین و مقررات</a> سایت موافقم.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-5">
+                 <div class="card bg-dark border-secondary shadow-sm rounded-4 sticky-top" style="top: 100px;">
+                    <div class="card-body p-4">
+                        <h4 class="card-title fw-bold mb-4">خلاصه سفارش</h4>
+                        <ul class="list-group list-group-flush mb-4">
+                            <?php foreach($cart_items as $item): ?>
+                            <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center px-0">
+                                <div class="d-flex align-items-center">
+                                    <img src="<?php echo htmlspecialchars($item['image_url']); ?>" width="60" class="rounded-3 me-3" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                                    <div>
+                                        <?php echo htmlspecialchars($item['name']); ?>
+                                        <small class="d-block text-muted">تعداد: <?php echo $item['quantity']; ?></small>
+                                    </div>
+                                </div>
+                                <span class="fw-bold"><?php echo number_format($item['price'] * $item['quantity']); ?></span>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">جمع کل</span>
+                            <span><?php echo number_format($total_price); ?> تومان</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">هزینه ارسال</span>
+                            <span class="text-success">رایگان</span>
+                        </div>
+                        <hr class="border-secondary">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="h5 fw-bold">مبلغ نهایی</span>
+                            <span class="h5 fw-bolder text-primary"><?php echo number_format($total_price); ?> تومان</span>
+                        </div>
+                        <div class="d-grid">
+                             <button type="submit" class="btn btn-primary btn-lg">ثبت نهایی سفارش</button>
+                        </div>
+                         <div class="text-center mt-3">
+                            <small class="text-muted"><i class="ri-lock-line me-1"></i> پرداخت امن و مطمئن</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
+    </form>
+</div>
 
-    <!-- Main Content -->
-    <main class="container my-5">
-        <div class="text-center mb-5">
-            <h2 class="font-lalezar display-4"><?php echo $p_title; ?></h2>
-        </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const savedAddressSelect = document.getElementById('saved_address');
+    if (savedAddressSelect) {
+        savedAddressSelect.addEventListener('change', function() {
+            if (this.value) {
+                try {
+                    const address = JSON.parse(this.value);
+                    document.getElementById('province').value = address.province || '';
+                    document.getElementById('city').value = address.city || '';
+                    document.getElementById('address_line').value = address.address_line || '';
+                    document.getElementById('postal_code').value = address.postal_code || '';
+                } catch (e) {
+                    console.error("Failed to parse address JSON:", e);
+                }
+            } else {
+                // Clear fields if no address is selected
+                document.getElementById('province').value = '';
+                document.getElementById('city').value = '';
+                document.getElementById('address_line').value = '';
+                document.getElementById('postal_code').value = '';
+            }
+        });
+    }
+});
+</script>
 
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <?php if ($order_placed_successfully): ?>
-                    <div class="alert alert-success text-center">
-                        <h4>از خرید شما متشکریم!</h4>
-                        <p>سفارش شما با موفقیت ثبت شد و به زودی پردازش خواهد شد. یک ایمیل تایید برای شما ارسال گردید.</p>
-                        <a href="shop.php" class="btn btn-warning">بازگشت به فروشگاه</a>
-                    </div>
-                <?php else: ?>
-                    <?php if (!empty($error_message)): ?>
-                        <div class="alert alert-danger">.<?php echo $error_message; ?></div>
-                    <?php endif; ?>
-                    <div class="card bg-dark-2">
-                        <div class="card-body p-4">
-                            <h5 class="card-title mb-4">اطلاعات ارسال</h5>
-                            <form action="checkout.php" method="POST">
-                                <div class="mb-3">
-                                    <label for="customer_name" class="form-label">نام و نام خانوادگی</label>
-                                    <input type="text" class="form-control bg-dark text-white" id="customer_name" name="customer_name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="customer_email" class="form-label">آدرس ایمیل</label>
-                                    <input type="email" class="form-control bg-dark text-white" id="customer_email" name="customer_email" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="customer_address" class="form-label">آدرس کامل</label>
-                                    <textarea class="form-control bg-dark text-white" id="customer_address" name="customer_address" rows="3" required></textarea>
-                                </div>
-                                <div class="d-grid mt-4">
-                                    <button type="submit" class="btn btn-warning btn-lg fw-bold">ثبت سفارش و پرداخت</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="py-5 mt-5 border-top border-secondary">
-        <div class="container text-center">
-            <p class="text-muted">&copy; <?php echo date("Y"); ?> چرم آتیمه. تمام حقوق محفوظ است.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php require_once 'includes/footer.php'; ?>

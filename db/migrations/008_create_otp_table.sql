@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS `otp_codes` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `email` VARCHAR(255) NOT NULL,
+    `code_hash` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `expires_at` TIMESTAMP NOT NULL,
+    `is_used` BOOLEAN NOT NULL DEFAULT FALSE,
+    INDEX `email_index` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

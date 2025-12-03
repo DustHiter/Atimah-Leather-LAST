@@ -37,9 +37,9 @@
                 <h5 class="fw-bold mb-3">ما را دنبال کنید</h5>
                 <p class="text-white-50">از جدیدترین محصولات و تخفیف‌ها باخبر شوید.</p>
                 <div class="d-flex mt-3 social-icons">
-                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-telegram"></i></a>
-                    <a href="#" class="btn btn-outline-primary"><i class="bi bi-whatsapp"></i></a>
+                    <a href="#" class="social-icon me-3"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="social-icon me-3"><i class="bi bi-telegram"></i></a>
+                    <a href="#" class="social-icon"><i class="bi bi-whatsapp"></i></a>
                 </div>
             </div>
         </div>
