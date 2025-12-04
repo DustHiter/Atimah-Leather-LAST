@@ -32,10 +32,16 @@ if (!$product) {
 // Set page title after fetching product name
 $page_title = htmlspecialchars($product['name']);
 
-// Safely decode colors JSON
-$available_colors = json_decode($product['colors'] ?? '[]', true);
-if (json_last_error() !== JSON_ERROR_NONE) {
-    $available_colors = []; // Assign empty array if JSON is invalid
+// Parse comma-separated colors string
+$available_colors = [];
+if (!empty($product['colors'])) {
+    $colors_raw = explode(',', $product['colors']);
+    foreach ($colors_raw as $color) {
+        $trimmed_color = trim($color);
+        if (!empty($trimmed_color)) {
+            $available_colors[] = $trimmed_color;
+        }
+    }
 }
 
 ?>
@@ -66,7 +72,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
                         <h5 class="mb-3">انتخاب رنگ:</h5>
                         <div class="color-swatches">
                             <?php foreach ($available_colors as $index => $color_hex): ?>
-                                <input type="radio" class="btn-check" name="product_color" id="color_<?php echo $index; ?>" value="<?php echo htmlspecialchars($color_hex); ?>" <?php echo ($index === 0) ? 'checked' : ''; ?>>
+                                <input type="radio" class="btn-check" name="product_color" id="color_<?php echo $index; ?>" value="<?php echo htmlspecialchars($color_hex); ?>" <?php echo (count($available_colors) === 1) ? 'checked' : ''; ?>>
                                 <label class="btn" for="color_<?php echo $index; ?>" style="background-color: <?php echo htmlspecialchars($color_hex); ?>;" title="<?php echo htmlspecialchars($color_hex); ?>"></label>
                             <?php endforeach; ?>
                         </div>
@@ -88,5 +94,104 @@ if (json_last_error() !== JSON_ERROR_NONE) {
         </div>
     </div>
 </main>
+
+<!-- SweetAlert for color validation -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- 1. Flash Message Handling (from server-side) ---
+    <?php
+    if (isset($_SESSION['flash_message'])) {
+        $flash_message = $_SESSION['flash_message'];
+        unset($_SESSION['flash_message']);
+        echo "Swal.fire({
+            title: '" . addslashes($flash_message['message']) . "',
+            icon: '" . $flash_message['type'] . "',
+            toast: true,
+            position: 'top-start',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            },
+            customClass: {
+                popup: 'dark-theme-toast'
+            }
+        });";
+    }
+    ?>
+
+    // --- 2. Client-side Color Selection Validation ---
+    const form = document.querySelector('form[action="cart_handler.php"]');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            const availableColors = <?php echo json_encode($available_colors); ?>;
+            const hasMultipleColors = Array.isArray(availableColors) && availableColors.length > 1;
+
+            if (hasMultipleColors) {
+                const selectedColor = document.querySelector('input[name="product_color"]:checked');
+                if (!selectedColor) {
+                    event.preventDefault(); // Stop form submission
+                    Swal.fire({
+                        title: 'لطفاً یک رنگ انتخاب کنید',
+                        text: 'برای افزودن این محصول به سبد خرید، انتخاب رنگ الزامی است.',
+                        icon: 'warning',
+                        confirmButtonText: 'متوجه شدم',
+                        customClass: {
+                            popup: 'dark-theme-popup',
+                            title: 'dark-theme-title',
+                            htmlContainer: 'dark-theme-content',
+                            confirmButton: 'dark-theme-button'
+                        }
+                    });
+                }
+            }
+        });
+    }
+});
+</script>
+<style>
+    body.swal2-shown > [aria-hidden="true"] {
+        filter: blur(5px);
+        transition: filter 0.3s ease-out;
+    }
+    .swal2-popup.dark-theme-popup {
+        background-color: #2a2a2e !important;
+        border-radius: 20px;
+    }
+    .swal2-title.dark-theme-title {
+        color: #e8e6e3 !important;
+    }
+    .swal2-html-container.dark-theme-content {
+        color: #b0b0b0 !important;
+    }
+    .swal2-confirm.dark-theme-button {
+        background-color: var(--primary-color) !important;
+        border-radius: 10px;
+        padding: .6em 2em;
+        box-shadow: none !important;
+        transition: background-color 0.2s;
+    }
+     .swal2-confirm.dark-theme-button:hover {
+        background-color: #c89c6c !important; /* A slightly lighter shade of primary for hover */
+    }
+
+    /* Toast Styles */
+    .swal2-toast.dark-theme-toast {
+        background-color: #2a2a2e !important;
+        color: #e8e6e3 !important;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .swal2-toast.dark-theme-toast .swal2-title {
+        color: #e8e6e3 !important;
+        font-size: 1em;
+    }
+    .swal2-toast.dark-theme-toast .swal2-timer-progress-bar {
+        background-color: var(--primary-color);
+    }
+</style>
 
 <?php require_once 'includes/footer.php'; ?>

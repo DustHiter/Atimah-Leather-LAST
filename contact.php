@@ -15,10 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_form'])) {
     } elseif (!$email) {
         $_SESSION['flash_message'] = ['type' => 'error', 'message' => 'آدرس ایمیل وارد شده معتبر نیست.'];
     } else {
-        // Send email using MailService
-        $to_email = getenv('MAIL_TO') ?: 'your-default-email@example.com'; // Fallback email
+        $to_email = getenv('MAIL_TO') ?: 'support@atimeh.com';
         $subject = "پیام جدید از فرم تماس وب‌سایت";
-
         $email_result = MailService::sendContactMessage($name, $email, $message, $to_email, $subject);
 
         if (!empty($email_result['success'])) {
@@ -29,64 +27,101 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_form'])) {
         }
     }
     
-    // Redirect to the same page to prevent form resubmission
     header("Location: contact.php");
     exit();
 }
 
-// Check for flash messages
 $flash_message = $_SESSION['flash_message'] ?? null;
 if ($flash_message) {
     unset($_SESSION['flash_message']);
 }
 ?>
 
-<main class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="text-center mb-5" data-aos="fade-down">
-                <h1 class="display-4 fw-bold">ارتباط با ما</h1>
-                <p class="fs-5 text-muted">نظرات، پیشنهادات و سوالات شما برای ما ارزشمند است.</p>
-            </div>
+<div class="container py-5 my-5">
+    <div class="section-title text-center mb-5" data-aos="fade-down">
+        <h1>ارتباط با ما</h1>
+        <p class="fs-5 text-muted">نظرات، پیشنهادات و سوالات شما برای ما ارزشمند است.</p>
+    </div>
 
-            <div class="card border-0 shadow-lg" data-aos="fade-up">
-                <div class="card-body p-4 p-md-5">
-                    <form action="contact.php" method="POST">
-                        <input type="hidden" name="contact_form">
-                        <div class="mb-4">
-                            <label for="name" class="form-label fs-5">نام شما</label>
-                            <input type="text" class="form-control form-control-lg bg-dark" id="name" name="name" required>
+    <div class="contact-card p-4 p-lg-5" data-aos="fade-up">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <div class="contact-info h-100 d-flex flex-column justify-content-center">
+                    <h3 class="mb-4">راه‌های ارتباطی</h3>
+                    <div class="d-flex align-items-start mb-4">
+                        <i class="fas fa-map-marker-alt mt-1 me-3"></i>
+                        <div>
+                            <strong>آدرس:</strong>
+                            <p class="text-muted mb-0">تهران، خیابان هنر، کوچه خلاقیت، پلاک ۱۲</p>
                         </div>
-                        <div class="mb-4">
-                            <label for="email" class="form-label fs-5">ایمیل</label>
-                            <input type="email" class="form-control form-control-lg bg-dark" id="email" name="email" required>
+                    </div>
+                    <div class="d-flex align-items-start mb-4">
+                        <i class="fas fa-envelope mt-1 me-3"></i>
+                        <div>
+                            <strong>ایمیل:</strong>
+                            <p class="mb-0"><a href="mailto:info@atimeh.com">info@atimeh.com</a></p>
                         </div>
-                        <div class="mb-4">
-                            <label for="message" class="form-label fs-5">پیام شما</label>
-                            <textarea class="form-control form-control-lg bg-dark" id="message" name="message" rows="6" required></textarea>
+                    </div>
+                    <div class="d-flex align-items-start mb-4">
+                        <i class="fas fa-phone-alt mt-1 me-3"></i>
+                        <div>
+                            <strong>تلفن:</strong>
+                            <p class="mb-0"><a href="tel:+982112345678">۰۲۱-۱۲۳۴۵۶۷۸</a></p>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">ارسال پیام</button>
-                        </div>
-                    </form>
+                    </div>
+                    <hr class="my-4" style="border-color: var(--luxury-border);">
+                    <h4 class="h5 mb-3">ما را دنبال کنید</h4>
+                    <div class="d-flex">
+                        <a href="#" class="btn btn-outline-primary rounded-circle me-2" style="width: 40px; height: 40px; line-height: 25px; text-align: center; padding: 5px;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle me-2" style="width: 40px; height: 40px; line-height: 25px; text-align: center; padding: 5px;"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle" style="width: 40px; height: 40px; line-height: 25px; text-align: center; padding: 5px;"><i class="fab fa-whatsapp"></i></a>
+                    </div>
                 </div>
+            </div>
+            <div class="col-lg-7">
+                <h3 class="mb-4">فرم تماس</h3>
+                <form action="contact.php" method="POST">
+                    <input type="hidden" name="contact_form">
+                    <div class="mb-4">
+                        <label for="name" class="form-label">نام شما</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="form-label">ایمیل</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="form-label">پیام شما</label>
+                        <textarea class="form-control" id="message" name="message" rows="7" required></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">ارسال پیام</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     <?php if ($flash_message): ?>
-    Swal.fire({
+    const swalConfig = {
         title: '<?php echo $flash_message["type"] === "success" ? "موفق" : "خطا"; ?>',
         text: '<?php echo addslashes($flash_message["message"]); ?>',
         icon: '<?php echo $flash_message["type"]; ?>',
         confirmButtonText: 'باشه',
-        background: '#2C2C2C',
-        color: '#D5D5D5'
-    });
+    };
+
+    // Apply dark theme to SweetAlert2
+    if (document.body.classList.contains('dark-luxury')) {
+        swalConfig.background = 'var(--luxury-surface)';
+        swalConfig.color = 'var(--luxury-text)';
+        swalConfig.confirmButtonColor = 'var(--luxury-primary)';
+    }
+
+    Swal.fire(swalConfig);
     <?php endif; ?>
 });
 </script>

@@ -1,832 +1,356 @@
-/*
-Default Dark Theme Variables.
-Light theme has been removed.
-*/
-:root {
-    --primary-color: #C0A080; /* Lighter tan for accents in dark mode */
-    --secondary-color: #8B4513; /* Darker brown */
-    --accent-color: #D2B48C;
-    --background-color: #1A1A1A; /* Very dark grey, almost black */
-    --surface-color: #2C2C2C; /* Dark grey for cards and surfaces */
-    --text-color: #EAEAEA; /* Brighter grey for better readability */
-    --heading-color: #FFFFFF; /* White for headings */
-    --border-color: #444444; /* Grey for borders */
-    --footer-bg: #111111; /* Even darker for footer */
-    --white-color: #FFFFFF;
-
-    --font-family-sans-serif: 'Vazirmatn', sans-serif;
-    --body-font: 'Vazirmatn', sans-serif;
-}
-
+/* General Body Styles */
 body {
-    font-family: var(--body-font);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.7;
+    font-family: 'Vazirmatn', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
     font-weight: 400;
+    direction: rtl;
+    text-align: right;
+}
+
+.overflow-hidden {
     overflow-x: hidden;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    color: var(--heading-color);
-}
 
-a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-a:hover {
-    color: var(--accent-color);
-    text-decoration: none;
-}
-
-/* --- Buttons --- */
-.btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--heading-color);
-    padding: 12px 30px;
-    font-weight: 600;
-    border-radius: 50px;
-    transition: all 0.3s ease-in-out;
-}
-
-.btn-primary:hover, .btn-primary:focus {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-}
-
-.btn-outline-primary {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    padding: 12px 30px;
-    font-weight: 600;
-    border-radius: 50px;
-}
-.btn-outline-primary:hover {
-    background-color: var(--primary-color);
-    color: var(--heading-color);
-}
-
-/* --- Header --- */
+/* Header Styles */
 .site-header {
-    background-color: var(--surface-color);
-    box-shadow: 0 2px 15px rgba(0,0,0,0.2);
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.3s ease;
-    position: sticky;
-    top: 0;
-    z-index: 1020;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #dee2e6;
 }
 
-.site-header .nav-link,
-.site-header a {
-    color: var(--text-color) !important;
+.site-header .navbar-brand {
+    letter-spacing: 1.5px;
+}
+
+.site-header .nav-link {
+    color: #6c757d;
     font-weight: 500;
-    font-size: 16px;
-    padding: 8px 12px;
-    position: relative;
-}
-
-.site-header a.active,
-.site-header a:hover {
-    color: var(--primary-color) !important;
-}
-
-.site-header .badge {
-    background-color: var(--primary-color) !important;
-    color: var(--heading-color) !important;
-}
-
-/* --- Footer --- */
-.site-footer {
-    background-color: var(--footer-bg);
-    color: #AFAFAF;
-}
-.site-footer h5 {
-    color: var(--heading-color);
-}
-.site-footer a {
-    color: #AFAFAF !important;
-}
-.site-footer a:hover {
-    color: var(--white-color) !important;
-}
-.site-footer .border-top {
-    border-color: var(--border-color) !important;
-}
-
-/* --- Product Card --- */
-.product-card {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 15px;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-}
-
-.product-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-}
-
-.product-card .product-image img {
-    transition: transform 0.5s ease;
-}
-
-.product-card:hover .product-image img {
-    transform: scale(1.05);
-}
-
-.product-card .product-info {
-    padding: 20px;
-}
-
-.product-card .product-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: var(--heading-color);
-}
-
-.product-card .product-price {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-/* --- Product Page Color Swatches --- */
-.color-swatches .btn-check + .btn {
-    border: 2px solid var(--border-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: inline-block;
-    padding: 0;
-    font-size: 0;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.color-swatches .btn-check:checked + .btn {
-    transform: scale(1.15);
-    box-shadow: 0 0 0 3px var(--surface-color), 0 0 0 5px var(--primary-color);
-}
-
-.color-swatches [style*="#000000"] + label {
-     border-color: #555;
-}
-
-/* --- Admin panel dark theme overrides --- */
-.bg-dark {
-    background-color: var(--background-color) !important;
-}
-
-.bg-dark-2 {
-    background-color: var(--surface-color) !important;
-}
-.form-control.bg-dark {
-    background-color: var(--background-color) !important;
-    color: var(--text-color) !important;
-    border-color: var(--border-color);
-}
-.form-control.bg-dark:focus {
-    background-color: var(--background-color) !important;
-    color: var(--text-color) !important;
-    border-color: var(--primary-color);
-    box-shadow: none;
-}
-
-/* --- Product Image Aspect Ratio --- */
-.product-image {
-    overflow: hidden;
-    position: relative;
-    background-color: var(--border-color); /* Placeholder bg */
-    aspect-ratio: 3 / 4; /* Enforce 3:4 aspect ratio */
-}
-
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* This will crop the image to fit */
-}
-
-/* --- Responsive Design --- */
-@media (max-width: 768px) {
-
-    /* About Us Mobile */
-    #about-us .display-5 {
-        font-size: 2rem;
-    }
-    #about-us .fs-5 {
-        font-size: 1.1rem;
-    }
-
-    .display-3 {
-        font-size: 2.5rem;
-    }
-    .display-4 {
-        font-size: 2rem;
-    }
-
-    .product-card .product-info {
-        padding: 15px;
-    }
-
-    .site-footer {
-        text-align: center;
-    }
-
-    .site-footer .col-lg-2, .site-footer .col-lg-3, .site-footer .col-lg-4 {
-        margin-bottom: 30px;
-    }
-
-    /* Center flex items in the footer on mobile */
-    .site-footer .d-flex {
-        justify-content: center;
-    }
-}
-
-/* --- Header Icon Fixes for Dark Mode --- */
-
-/* Ensure theme toggle and other header buttons are visible in dark mode */
-.site-header .btn {
-    color: var(--text-color);
-}
-
-.site-header .btn:hover {
-    color: var(--primary-color);
-}
-
-/* Fix for bootstrap's default hamburger icon in dark mode */
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-
-/* Fix for the border color of the toggler button itself */
-.navbar-toggler {
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
-@media (max-width: 767.98px) {
-    .social-icons {
-        justify-content: center;
-    }
-}
-
-/* --- Custom Gold Button --- */
-.btn-outline-gold {
-    border-color: var(--accent-color);
-    color: var(--accent-color);
-    padding: 12px 30px;
-    font-weight: 600;
-    border-radius: 50px;
-    transition: all 0.3s ease-in-out;
-}
-
-.btn-outline-gold:hover {
-    background-color: var(--accent-color);
-    color: var(--heading-color);
-}
-
-
-/* --- Hero Section Text --- */
-.hero-section {
-    position: relative;
-    height: 70vh;
-    display: flex;
-    align-items: center;
-    background: url('../assets/pasted-20251201-135328-2aedc448.jpg') no-repeat center center/cover;
-}
-
-.hero-section .container {
-    width: 100%;
-    text-align: center;
-}
-
-.hero-section .row {
-    justify-content: flex-end;
-}
-.hero-section h1,
-.hero-section p {
-    color: #FFFFFF;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-
-/* --- About Us Section Text Color Fix --- */
-#about-us p {
-    color: var(--text-color) !important;
-}
-
-
-/* --- Footer Social Icons --- */
-.social-icon {
-    font-size: 1.5rem; /* Larger icons */
-    transition: all 0.3s ease;
-    display: inline-block; /* Needed for transform */
-    color: #AFAFAF !important; /* Default icon color from footer */
-}
-
-.social-icon:hover {
-    transform: translateY(-3px) scale(1.1); /* Lift and grow effect */
-}
-
-/* Brand Colors on Hover */
-.social-icon.bi-instagram:hover { color: #E4405F !important; }
-.social-icon.bi-telegram:hover { color: #26A5E4 !important; }
-.social-icon.bi-whatsapp:hover { color: #25D366 !important; }
-
-/* --- Admin Panel Sidebar --- */
-body.admin-page {
-    padding-right: 260px; /* Make space for the sidebar */
-    transition: padding-right 0.3s ease;
-}
-
-.admin-sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: 260px;
-    z-index: 1030;
-    display: flex;
-    flex-direction: column;
-    transition: right 0.3s ease;
-}
-
-.admin-sidebar h3 {
-    font-family: 'Lalezar', cursive;
-    font-size: 1.5rem;
-}
-
-.admin-sidebar .nav-link {
-    color: var(--text-color);
-    font-size: 1.05rem;
-    padding: 15px 25px;
-    border-right: 4px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.admin-sidebar .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-right-color: var(--accent-color);
-    color: var(--white-color);
-}
-
-.admin-sidebar .nav-link.active {
-    background-color: var(--primary-color);
-    color: var(--heading-color);
-    border-right-color: var(--accent-color);
-    font-weight: 700;
-}
-
-.admin-sidebar .sidebar-footer {
-    margin-top: auto;
-    padding: 25px;
-    border-top: 1px solid var(--border-color);
-}
-
-.admin-main-content {
-    padding: 2rem;
-}
-
-/* Responsive Admin Layout */
-@media (max-width: 992px) {
-    body.admin-page {
-        padding-right: 0;
-    }
-    .admin-sidebar {
-        right: -260px; /* Hide sidebar off-screen */
-    }
-    .admin-main-content {
-        padding: 1rem;
-    }
-    /* We'll need a hamburger menu button to toggle the sidebar on mobile */
-}
-
-/*--------------------------------------------------------------
-# Shopping Cart Page (Dark Theme)
---------------------------------------------------------------*/
-.cart-page-wrapper {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-}
-
-.cart-item-card {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    transition: box-shadow 0.3s ease;
-    position: relative;
-}
-
-.cart-item-card:hover {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.cart-item-image img {
-    border-radius: 8px;
-}
-
-.cart-item-details h5 a {
-    font-weight: 600;
-    color: var(--heading-color);
-    text-decoration: none;
     transition: color 0.3s ease;
 }
 
-.cart-item-details h5 a:hover {
-    color: var(--primary-color);
+.site-header .nav-link:hover,
+.site-header .nav-link.active {
+    color: #000;
 }
 
-.quantity-selector {
-    display: flex;
-    align-items: center;
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    padding: 5px;
-    max-width: 120px;
+.site-header .dropdown-menu {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
 }
 
-.quantity-selector .btn {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-weight: 600;
+.site-header .btn-primary {
+    background-color: #000;
+    border-color: #000;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.site-header .btn-primary:hover {
+    background-color: #333;
+    border-color: #333;
+}
+
+
+/* Main Content Styles */
+.hero {
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    color: white;
 }
 
-.quantity-selector .btn:hover {
-    background-color: var(--primary-color);
-    color: var(--heading-color);
-    border-color: var(--primary-color);
+.hero-content {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 4rem;
+    border-radius: 1rem;
+    max-width: 800px;
 }
 
-.quantity-selector .quantity-input {
+/* Shop Page Styles */
+.product-card {
     border: none;
-    background: transparent;
-    font-weight: 700;
-    color: var(--heading-color);
-    width: 40px;
-    text-align: center;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff;
 }
 
-.item-price {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary-color);
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
 }
 
-.remove-item-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
+.product-card .card-img-top {
+    border-radius: 1rem 1rem 0 0;
+    height: 300px;
+    object-fit: cover;
 }
 
-.remove-item-btn .btn {
-    color: #888;
-    font-size: 1.2rem;
-    padding: 0;
+.product-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #000;
+    color: #fff;
+    padding: 4rem 0;
+}
+
+.footer a {
+    color: #adb5bd;
+    text-decoration: none;
     transition: color 0.3s ease;
 }
 
-.remove-item-btn .btn:hover {
-    color: #e74c3c;
+.footer a:hover {
+    color: #fff;
 }
 
-/* Order Summary Card */
-.order-summary-card {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 2rem;
-    position: sticky;
-    top: 120px;
+/* Cart Page Styles */
+.cart-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.5rem;
 }
 
-.order-summary-card .card-title {
-    font-weight: 700;
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
+/* Dark Luxury Theme Specifics */
+:root {
+    --luxury-bg: #121212;
+    --luxury-surface: #1e1e1e;
+    --luxury-primary: #c09f80; /* Gold */
+    --luxury-text: #e0e0e0;
+    --luxury-text-muted: #8e8e8e;
+    --luxury-border: #333;
 }
 
-.summary-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+.dark-luxury body {
+    background-color: var(--luxury-bg);
+    color: var(--luxury-text);
 }
 
-.summary-item .label {
-    color: #aaa;
+.dark-luxury .site-header {
+    background-color: rgba(30, 30, 30, 0.8); /* Dark surface with transparency */
+    border-bottom-color: var(--luxury-border);
 }
 
-.summary-item .value {
-    font-weight: 600;
-    color: var(--text-color);
+.dark-luxury .nav-link {
+    color: var(--luxury-text-muted);
+}
+.dark-luxury .nav-link:hover, .dark-luxury .nav-link.active {
+    color: var(--luxury-primary);
+}
+.dark-luxury .navbar-brand {
+    color: var(--luxury-text);
 }
 
-.summary-total {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
+/* Add any other specific overrides for dark luxury theme */
+.dark-luxury .footer {
+    background-color: #0c0c0c;
 }
 
-.summary-total .label {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--heading-color);
-}
-
-.summary-total .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.btn-checkout {
-    padding: 14px 20px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 8px;
-}
-
-/* Empty Cart */
-.empty-cart-container {
-    background: var(--surface-color);
-    border-radius: 12px;
-    padding: 4rem;
-    text-align: center;
-    border: 1px solid var(--border-color);
-}
-
-.empty-cart-container .ri-shopping-cart-line {
-    font-size: 5rem;
-    color: var(--primary-color);
-    opacity: 0.8;
-}
-
-.empty-cart-container h2 {
-    font-weight: 700;
-    margin-top: 1.5rem;
-    color: var(--heading-color);
-}
-
-.empty-cart-container p {
-    max-width: 400px;
-    margin: 1rem auto 2rem auto;
-    color: #aaa;
-}
-
-/*--------------------------------------------------------------
-# Checkout Page (Dark Theme)
---------------------------------------------------------------*/
-.checkout-form-section {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 2.5rem;
-}
-
-@media (max-width: 991.98px) {
-    .checkout-form-section {
-        padding: 1.5rem;
+    .track-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 40px;
+        background-color: var(--luxury-surface);
+        border-radius: 15px;
+        border: 1px solid var(--luxury-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        text-align: right;
     }
-}
 
-.checkout-form-section h4 {
-    font-weight: 700;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group .form-control {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    border-radius: 8px;
-    padding: 12px 20px;
-    height: 52px;
-    transition: all 0.3s ease;
-}
-
-.form-group .form-control:focus {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(192, 160, 128, 0.2);
-}
-
-.form-group textarea.form-control {
-    height: auto;
-}
-
-.form-text-info {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--accent-color) !important;
-    opacity: 0.9;
-}
-
-/* Address Cards */
-.address-card-selector .address-card {
-    background: var(--background-color);
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    padding: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    height: 100%;
-}
-
-.address-card-selector .address-card:hover {
-    border-color: var(--primary-color);
-}
-
-.address-card-selector .address-card.selected {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 15px rgba(192, 160, 128, 0.3);
-}
-
-.address-card-selector .form-check-input {
-    width: 1.5em;
-    height: 1.5em;
-    margin-top: 0.2em;
-}
-
-.address-card-title {
-    font-weight: 600;
-    color: var(--heading-color);
-    margin-bottom: 0.5rem;
-}
-
-.address-card-detail {
-    font-size: 0.9rem;
-    color: var(--text-color);
-    line-height: 1.6;
-}
-
-.address-card-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
-}
-
-#new-address-form-wrapper {
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    padding: 2rem;
-    margin-top: 1.5rem;
-}
-
-/* Checkout Summary */
-.checkout-summary-card {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 2rem;
-    position: sticky;
-    top: 120px;
-}
-
-.checkout-summary-card .list-group-item {
-    background-color: transparent;
-    border-color: var(--border-color);
-    color: var(--text-color);
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.checkout-summary-card .summary-title {
-     font-weight: 700;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.secure-payment-info {
-    font-size: 0.9rem;
-    color: #aaa;
-}
-
-.secure-payment-info i {
-    color: #28a745;
-}
-
-.form-check-label a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-.form-check-label a:hover {
-    text-decoration: underline;
-}
-
-/*================================================
-# Checkout & Auth Page Dark Theme REFINEMENTS
-================================================*/
-
-/* General text & label color fix */
-body.bg-dark, .bg-dark, .checkout-form-section, .login-form-section {
-    /* Make sure all labels and general text are readable */
-    .form-label, label {
-        color: #EAEAEA !important; /* Use a bright, readable color */
-        opacity: 0.9;
-        font-weight: 500;
-        margin-bottom: 0.75rem;
+    .track-container h1 {
+        font-weight: 700;
+        color: var(--luxury-text);
+        margin-bottom: 20px;
     }
-    .text-muted {
-        color: #a0a0a0 !important; /* A lighter muted color for dark bg */
+
+    .track-container p {
+        color: var(--luxury-text-muted);
     }
-}
+    
+    #result-message {
+         color: var(--luxury-text-muted);
+    }
 
+    .form-group {
+        margin-bottom: 20px;
+    }
 
-/* Improved Form Control Styles */
-.form-control.bg-dark, .form-select.bg-dark {
-    color: var(--text-color) !important;
-    background-color: #1c1c1c !important; /* Slightly lighter than main bg */
-    border: 1px solid #4a4a4a;
-    border-radius: 8px;
-    height: 50px;
-    transition: all 0.3s ease;
-}
+    .form-group label {
+        font-weight: 600;
+        color: var(--luxury-text-muted);
+        display: block;
+        margin-bottom: 8px;
+    }
 
-.form-control.bg-dark:focus, .form-select.bg-dark:focus {
-    background-color: #1c1c1c !important;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(192, 160, 128, 0.25);
-}
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: var(--luxury-bg);
+        border: 1px solid var(--luxury-border);
+        color: var(--luxury-text);
+        transition: all 0.3s ease;
+    }
 
-textarea.form-control.bg-dark {
-    height: auto;
-}
+    .form-group input:focus {
+        border-color: var(--luxury-primary);
+        box-shadow: 0 0 8px rgba(192, 159, 128, 0.25);
+        background-color: var(--luxury-bg);
+    }
 
-/* Style for the select dropdown arrow */
-.form-select.bg-dark {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d2b48c' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-}
+    .btn-track {
+        width: 100%;
+        padding: 15px;
+        background-color: var(--luxury-primary);
+        color: var(--luxury-bg);
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-/* Checkbox styles */
-.form-check-input {
-    background-color: #333;
-    border: 1px solid #555;
-}
-.form-check-input:checked {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-.form-check-input:focus {
-     box-shadow: 0 0 0 3px rgba(192, 160, 128, 0.25);
-}
-.form-check-label {
-    color: #ccc;
-}
-.form-check-label a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-.form-check-label a:hover {
-    text-decoration: underline;
-}
+    .btn-track:hover {
+        background-color: #d4b090; /* A lighter shade of gold */
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(192, 159, 128, 0.2);
+    }
 
-/* Order Summary Card Refinements */
-.list-group-item.bg-dark {
-    border-color: #444 !important; /* Darker border for list items */
-}
+    /* Modal Styles */
+    .modal {
+        display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+        width: 100%; height: 100%; overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+    }
 
-hr {
-    border-top-color: #444;
-}
+    .modal-content {
+        background-color: var(--luxury-surface);
+        margin: 5% auto;
+        padding: 40px;
+        border: 1px solid var(--luxury-border);
+        width: 90%;
+        max-width: 800px;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        animation: slide-down 0.5s ease-out;
+        color: var(--luxury-text);
+    }
 
-.text-primary {
-    color: var(--primary-color) !important;
-}
+    @keyframes slide-down {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
 
-.btn-primary.btn-lg {
-    padding-top: 0.9rem;
-    padding-bottom: 0.9rem;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
-}
+    .close-btn {
+        color: var(--luxury-text-muted);
+        float: left;
+        font-size: 32px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: var(--luxury-primary);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--luxury-border);
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+        text-align: right;
+    }
+    .modal-header h2 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--luxury-text);
+    }
+    .modal-header p {
+        margin: 5px 0 0;
+        color: var(--luxury-text-muted);
+        font-size: 0.9rem;
+    }
+    .order-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+    .detail-box {
+        background-color: var(--luxury-bg);
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid var(--luxury-border);
+    }
+    .detail-box h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--luxury-primary);
+        border-bottom: 1px solid var(--luxury-border);
+        padding-bottom: 10px;
+    }
+    .detail-box p {
+        margin: 10px 0;
+        color: var(--luxury-text);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    .detail-box p strong {
+        color: var(--luxury-text-muted);
+        min-width: 120px;
+        display: inline-block;
+    }
+    .products-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    .products-table th, .products-table td {
+        padding: 15px;
+        text-align: right;
+        border-bottom: 1px solid var(--luxury-border);
+    }
+    .products-table th {
+        color: var(--luxury-primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+    .products-table tr:last-child td {
+        border-bottom: none;
+    }
+    .products-table img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        vertical-align: middle;
+        margin-left: 15px;
+    }
+    .total-price-container {
+        text-align: left;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--luxury-border);
+    }
+    .total-price-container p {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--luxury-primary);
+        margin: 0;
+    }

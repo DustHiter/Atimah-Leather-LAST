@@ -12,6 +12,9 @@ switch ($action) {
     case 'verify_otp':
         handle_verify_otp();
         break;
+    case 'google_login':
+        handle_google_login();
+        break;
     case 'logout':
         handle_logout();
         break;
@@ -144,4 +147,122 @@ function flash_message($type, $message, $location) {
     $_SESSION['flash_message'] = ['type' => $type, 'message' => $message];
     header("Location: $location");
     exit;
+}
+
+function handle_google_login() {
+    // Load Google credentials from .env
+    $google_client_id = getenv('GOOGLE_CLIENT_ID');
+    $google_client_secret = getenv('GOOGLE_CLIENT_SECRET');
+    
+    // The redirect URI must be the exact same one configured in your Google Cloud project
+    $redirect_uri = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . strtok($_SERVER["REQUEST_URI"], '?') . '?action=google_login';
+
+    if (empty($google_client_id) || empty($google_client_secret)) {
+        flash_message('danger', 'قابلیت ورود با گوگل هنوز پیکربندی نشده است.', 'login.php');
+    }
+
+    // If 'code' is not in the query string, this is the initial request. Redirect to Google.
+    if (!isset($_GET['code'])) {
+        $auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
+            'client_id' => $google_client_id,
+            'redirect_uri' => $redirect_uri,
+            'response_type' => 'code',
+            'scope' => 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+            'access_type' => 'online',
+            'prompt' => 'select_account'
+        ]);
+        header('Location: ' . $auth_url);
+        exit;
+    } 
+    // If 'code' is present, this is the callback from Google.
+    else {
+        try {
+            // Step 1: Exchange authorization code for an access token
+            $token_url = 'https://oauth2.googleapis.com/token';
+            $token_data = [
+                'code' => $_GET['code'],
+                'client_id' => $google_client_id,
+                'client_secret' => $google_client_secret,
+                'redirect_uri' => $redirect_uri,
+                'grant_type' => 'authorization_code'
+            ];
+
+            $token_response = curl_request($token_url, 'POST', $token_data);
+            
+            if (!isset($token_response['access_token'])) {
+                throw new Exception("Failed to get access token from Google. Response: " . json_encode($token_response));
+            }
+            
+            // Step 2: Use access token to get user's profile information
+            $userinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo?access_token=' . $token_response['access_token'];
+            $userinfo = curl_request($userinfo_url);
+
+            if (!isset($userinfo['email'])) {
+                throw new Exception("Failed to get user info from Google. Response: " . json_encode($userinfo));
+            }
+
+            // Step 3: Log in or create user
+            $email = filter_var($userinfo['email'], FILTER_VALIDATE_EMAIL);
+            $first_name = $userinfo['given_name'] ?? '';
+            $last_name = $userinfo['family_name'] ?? '';
+
+            $pdo = db();
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $user_id = null;
+            if ($user) {
+                // User exists, log them in
+                $user_id = $user['id'];
+                // Update name if it's missing
+                if (empty($user['first_name']) && !empty($first_name)) {
+                    $stmt_update = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ? WHERE id = ?");
+                    $stmt_update->execute([$first_name, $last_name, $user_id]);
+                }
+            } else {
+                // User does not exist, create a new one
+                $stmt_create = $pdo->prepare("INSERT INTO users (email, first_name, last_name, is_admin) VALUES (?, ?, ?, 0)");
+                $stmt_create->execute([$email, $first_name, $last_name]);
+                $user_id = $pdo->lastInsertId();
+            }
+
+            // Set session variables for login
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['user_name'] = $first_name;
+            unset($_SESSION['otp_email']); // Clean up OTP session if it exists
+
+            flash_message('success', 'شما با موفقیت با حساب گوگل وارد شدید!', 'index.php');
+
+        } catch (Exception $e) {
+            error_log('Google Login Error: ' . $e->getMessage());
+            flash_message('danger', 'خطایی در فرآیند ورود با گوگل رخ داد. لطفاً دوباره تلاش کنید.', 'login.php');
+        }
+    }
+}
+
+function curl_request($url, $method = 'GET', $data = []) {
+    $ch = curl_init();
+    
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    }
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    // Set a common user agent
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+    $response = curl_exec($ch);
+    
+    if (curl_errno($ch)) {
+        $error_msg = curl_error($ch);
+        curl_close($ch);
+        throw new Exception("cURL Error: " . $error_msg);
+    }
+
+    curl_close($ch);
+    return json_decode($response, true);
 }

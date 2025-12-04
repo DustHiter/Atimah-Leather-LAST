@@ -76,14 +76,17 @@ require_once 'includes/header.php';
                             <div class="col-md-6">
                                 <label for="first_name" class="form-label">نام</label>
                                 <input type="text" class="form-control bg-dark text-light" id="first_name" name="first_name" value="<?php echo htmlspecialchars($logged_in_user['first_name'] ?? ''); ?>" required>
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label for="last_name" class="form-label">نام خانوادگی</label>
                                 <input type="text" class="form-control bg-dark text-light" id="last_name" name="last_name" value="<?php echo htmlspecialchars($logged_in_user['last_name'] ?? ''); ?>" required>
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label for="phone_number" class="form-label">تلفن همراه</label>
                                 <input type="tel" class="form-control bg-dark text-light" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($logged_in_user['phone_number'] ?? ''); ?>" required>
+                                <div class="invalid-feedback"></div>
                                 <?php if (!$is_logged_in): ?>
                                     <div class="form-text text-info fw-bold">توجه: فقط با شماره تلفن همراه میتوان سفارش را رهگیری کرد.</div>
                                 <?php endif; ?>
@@ -91,22 +94,27 @@ require_once 'includes/header.php';
                             <div class="col-md-6">
                                 <label for="province" class="form-label">استان</label>
                                 <input type="text" class="form-control bg-dark text-light" id="province" name="province" required>
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label for="city" class="form-label">شهر</label>
                                 <input type="text" class="form-control bg-dark text-light" id="city" name="city" required>
+                                <div class="invalid-feedback"></div>
                             </div>
                              <div class="col-md-6">
                                 <label for="address_line" class="form-label">آدرس دقیق</label>
                                 <textarea class="form-control bg-dark text-light" id="address_line" name="address_line" rows="2" required></textarea>
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-5">
                                 <label for="postal_code" class="form-label">کد پستی</label>
                                 <input type="text" class="form-control bg-dark text-light" id="postal_code" name="postal_code" required>
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-7">
                                 <label for="email" class="form-label">ایمیل (اختیاری)</label>
                                 <input type="email" class="form-control bg-dark text-light" id="email" name="email" value="<?php echo htmlspecialchars($logged_in_user['email'] ?? ''); ?>">
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                          <div class="form-check mt-4">
@@ -114,6 +122,7 @@ require_once 'includes/header.php';
                             <label class="form-check-label" for="terms">
                                 با <a href="#">قوانین و مقررات</a> سایت موافقم.
                             </label>
+                            <div class="invalid-feedback">لطفاً قوانین و مقررات را بپذیرید.</div>
                         </div>
                     </div>
                 </div>
@@ -132,6 +141,12 @@ require_once 'includes/header.php';
                                     <div>
                                         <?php echo htmlspecialchars($item['name']); ?>
                                         <small class="d-block text-muted">تعداد: <?php echo $item['quantity']; ?></small>
+                                        <?php if (!empty($item['color'])): ?>
+                                            <div class="d-flex align-items-center gx-2 mt-1">
+                                                <small class="text-muted">رنگ:</small>
+                                                <span class="d-inline-block rounded-circle border ms-2" style="width: 15px; height: 15px; background-color: <?php echo htmlspecialchars($item['color']); ?>;"></span>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <span class="fw-bold"><?php echo number_format($item['price'] * $item['quantity']); ?></span>
@@ -165,31 +180,6 @@ require_once 'includes/header.php';
     </form>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const savedAddressSelect = document.getElementById('saved_address');
-    if (savedAddressSelect) {
-        savedAddressSelect.addEventListener('change', function() {
-            if (this.value) {
-                try {
-                    const address = JSON.parse(this.value);
-                    document.getElementById('province').value = address.province || '';
-                    document.getElementById('city').value = address.city || '';
-                    document.getElementById('address_line').value = address.address_line || '';
-                    document.getElementById('postal_code').value = address.postal_code || '';
-                } catch (e) {
-                    console.error("Failed to parse address JSON:", e);
-                }
-            } else {
-                // Clear fields if no address is selected
-                document.getElementById('province').value = '';
-                document.getElementById('city').value = '';
-                document.getElementById('address_line').value = '';
-                document.getElementById('postal_code').value = '';
-            }
-        });
-    }
-});
-</script>
+<script src="assets/js/checkout_validation.js?v=<?php echo time(); ?>"></script>
 
 <?php require_once 'includes/footer.php'; ?>

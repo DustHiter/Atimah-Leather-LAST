@@ -2,8 +2,29 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Log page views for non-admin pages
+if (strpos($_SERVER['REQUEST_URI'], '/admin/') === false) {
+    require_once __DIR__ . '/../db/config.php';
+    try {
+        $pdo = db();
+        // Check if the table exists to avoid errors before migration
+        $table_check = $pdo->query("SHOW TABLES LIKE 'page_views'");
+        if ($table_check->rowCount() > 0) {
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $page_url = $_SERVER['REQUEST_URI'];
+            $stmt = $pdo->prepare("INSERT INTO page_views (page_url, ip_address) VALUES (?, ?)");
+            $stmt->execute([$page_url, $ip_address]);
+        }
+    } catch (PDOException $e) {
+        // Silently fail or log to a file to not break the page for users
+        error_log("Could not log page view: " . $e->getMessage());
+    }
+}
+
 $cart_item_count = isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0;
 $page_title = $page_title ?? 'فروشگاه آتیمه'; // Default title
+
 ?>
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -18,6 +39,28 @@ $page_title = $page_title ?? 'فروشگاه آتیمه'; // Default title
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <!-- Bootstrap Variable Overrides for Dark Luxury Theme -->
+    <style>
+        :root {
+            --luxury-bg: #111214;
+            --luxury-surface: #1a1b1e;
+            --luxury-text: #eceff1;
+            --luxury-text-muted: #90a4ae;
+            --luxury-primary: #c09f80;
+            --luxury-border: #37474f;
+
+            /* Override Bootstrap's root variables */
+            --bs-body-bg: var(--luxury-bg);
+            --bs-body-color: var(--luxury-text);
+            --bs-primary: var(--luxury-primary);
+            --bs-primary-rgb: 192, 159, 128;
+            --bs-link-color: var(--luxury-primary);
+            --bs-link-hover-color: #d4b090; /* A lighter gold for hover */
+            --bs-border-color: var(--luxury-border);
+            --bs-tertiary-bg: var(--luxury-surface);
+        }
+    </style>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -29,6 +72,8 @@ $page_title = $page_title ?? 'فروشگاه آتیمه'; // Default title
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/assets/css/custom.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/assets/css/dark_luxury.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <script>
         // Apply theme from local storage before page load to prevent flashing
@@ -43,10 +88,9 @@ $page_title = $page_title ?? 'فروشگاه آتیمه'; // Default title
     </script>
 
 </head>
-<body>
+<body class="dark-luxury">
     <div class="overflow-hidden">
     <?php
-    $current_page = basename($_SERVER['PHP_SELF']);
     $is_admin_page = strpos($_SERVER['REQUEST_URI'], '/admin/') !== false;
     ?>
 

@@ -1,0 +1,1 @@
+ALTER TABLE `orders` CHANGE `customer_phone` `billing_phone` VARCHAR(50) DEFAULT NULL;

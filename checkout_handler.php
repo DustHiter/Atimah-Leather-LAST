@@ -40,16 +40,16 @@ try {
     $total_amount = array_reduce($cart_items, function ($sum, $item) {
         return $sum + ($item['price'] * $item['quantity']);
     }, 0);
-    $items_json = json_encode($cart_items, JSON_UNESCAPED_UNICODE);
+    $products_data_json = json_encode($cart_items, JSON_UNESCAPED_UNICODE);
 
     // 5. Insert the order into the database using the correct, updated column names
     $stmt = $pdo->prepare(
-        "INSERT INTO orders (user_id, billing_name, billing_email, customer_phone, shipping_province, shipping_city, shipping_address_line, shipping_postal_code, total_amount, items_json, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO orders (user_id, billing_name, billing_email, billing_phone, billing_province, billing_city, billing_address, billing_postal_code, total_amount, items_json, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-    $status = 'Pending'; // Default status
-    $final_email = ($email !== false && $email !== '') ? $email : null; // Ensure email is null if empty/invalid, not false
+    $status = 'Processing'; // Default status
+    $final_email = ($email !== false && $email !== '') ? $email : null; 
 
     $stmt->execute([
         $user_id,
@@ -61,9 +61,15 @@ try {
         $address_line,
         $postal_code,
         $total_amount,
-        $items_json,
+        $products_data_json,
         $status
     ]);
+    
+    $order_id = $pdo->lastInsertId();
+    $tracking_id = uniqid('ATMH-');
+
+    $update_stmt = $pdo->prepare("UPDATE orders SET tracking_id = ? WHERE id = ?");
+    $update_stmt->execute([$tracking_id, $order_id]);
     
     // 6. If user is logged in, save the new address for future use
     if ($user_id) {
@@ -84,9 +90,12 @@ try {
     // 7. Commit transaction
     $pdo->commit();
 
-    // 8. Clear the cart and redirect with a success message
+    // 8. Clear the cart and redirect with a success message including tracking ID
     unset($_SESSION['cart']);
-    $_SESSION['success_message'] = 'سفارش شما با موفقیت ثبت شد! از خرید شما متشکریم.';
+    $_SESSION['success_message'] = "سفارش شما با موفقیت ثبت شد! کد پیگیری شما: <strong>" . htmlspecialchars($tracking_id) . "</strong>";
+    // As I don't have SMS capability, I am displaying the tracking code here.
+    // You can later integrate an SMS service and send the tracking ID to $phone_number.
+    
     header('Location: index.php');
     exit;
 

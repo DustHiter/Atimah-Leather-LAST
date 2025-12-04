@@ -1,10 +1,8 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/auth_handler.php';
 
 // Check if the user is logged in. If not, redirect to the login page.
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+if (!is_admin()) {
     header('Location: login.php');
     exit;
 }
