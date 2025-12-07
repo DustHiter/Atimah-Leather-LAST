@@ -34,32 +34,8 @@ $page_title = $page_title ?? 'فروشگاه آتیمه'; // Default title
     <title><?php echo htmlspecialchars($page_title); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars($_SERVER['PROJECT_DESCRIPTION'] ?? 'خرید محصولات چرمی لوکس و با کیفیت.'); ?>">
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap Variable Overrides for Dark Luxury Theme -->
-    <style>
-        :root {
-            --luxury-bg: #111214;
-            --luxury-surface: #1a1b1e;
-            --luxury-text: #eceff1;
-            --luxury-text-muted: #90a4ae;
-            --luxury-primary: #c09f80;
-            --luxury-border: #37474f;
-
-            /* Override Bootstrap's root variables */
-            --bs-body-bg: var(--luxury-bg);
-            --bs-body-color: var(--luxury-text);
-            --bs-primary: var(--luxury-primary);
-            --bs-primary-rgb: 192, 159, 128;
-            --bs-link-color: var(--luxury-primary);
-            --bs-link-hover-color: #d4b090; /* A lighter gold for hover */
-            --bs-border-color: var(--luxury-border);
-            --bs-tertiary-bg: var(--luxury-surface);
-        }
-    </style>
+    <!-- IRANSans Font -->
+    <link rel="stylesheet" href="https://font-ir.s3.ir-thr-at1.arvanstorage.com/IRANSans/css/IRANSans.css">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -70,10 +46,11 @@ $page_title = $page_title ?? 'فروشگاه آتیمه'; // Default title
     <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+    <!-- Main Theme CSS -->
+    <link rel="stylesheet" href="/assets/css/theme.css?v=<?php echo time(); ?>">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/assets/css/custom.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="/assets/css/dark_luxury.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <script>
         // Apply theme from local storage before page load to prevent flashing

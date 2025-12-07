@@ -2,6 +2,8 @@
 session_start();
 require_once __DIR__ . '/auth_check.php';
 require_once __DIR__ . '/../db/config.php';
+
+$page_title = 'داشبورد';
 require_once __DIR__ . '/header.php';
 
 $dashboard_error = null;
@@ -48,30 +50,7 @@ function get_status_badge_class($status) {
 }
 ?>
 
-<style>
-.status-badge {
-    padding: 0.3em 0.6em;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #fff;
-}
-.status-processing { background-color: var(--admin-info); }
-.status-shipped { background-color: var(--admin-warning); }
-.status-delivered { background-color: var(--admin-success); }
-.status-cancelled { background-color: var(--admin-danger); }
-.status-pending { background-color: var(--admin-text-muted); }
-.stat-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-</style>
 
-<div class="admin-header">
-    <h1>داشبورد اصلی</h1>
-</div>
 
 <?php if ($flash_message): ?>
 <script>

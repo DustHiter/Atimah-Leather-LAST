@@ -30,29 +30,29 @@ require_once 'includes/header.php';
         <div class="text-center mb-5" data-aos="fade-down">
             <h2 class="fw-bold">ارزش‌های ما</h2>
         </div>
-        <div class="row text-center g-4 justify-content-center">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="values-card h-100">
-                     <i class="ri-gem-line mb-3"></i>
+        <ul class="about-us-list">
+            <li class="about-us-item" data-aos="fade-up" data-aos-delay="100">
+                <div class="inner">
+                    <i class="ri-award-line ri-2x mb-3"></i>
                     <h4 class="fw-bold">تعهد به کیفیت</h4>
                     <p class="text-muted px-3">استفاده از بهترین مواد اولیه و کنترل کیفی دقیق در تمام مراحل تولید.</p>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                 <div class="values-card h-100">
-                    <i class="ri-hand-heart-line mb-3"></i>
+            </li>
+            <li class="about-us-item" data-aos="fade-up" data-aos-delay="200">
+                <div class="inner">
+                    <i class="ri-hand-heart-line ri-2x mb-3"></i>
                     <h4 class="fw-bold">هنر دست</h4>
                     <p class="text-muted px-3">تمام محصولات ما با عشق و دقت توسط هنرمندان ماهر ساخته می‌شوند.</p>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                 <div class="values-card h-100">
-                    <i class="ri-leaf-line mb-3"></i>
+            </li>
+            <li class="about-us-item" data-aos="fade-up" data-aos-delay="300">
+                <div class="inner">
+                    <i class="ri-leaf-line ri-2x mb-3"></i>
                     <h4 class="fw-bold">طراحی ماندگار</h4>
                     <p class="text-muted px-3">خلق آثاری مدرن و در عین حال کلاسیک که هیچ‌گاه از مد نمی‌افتند.</p>
                 </div>
-            </div>
-        </div>
+            </li>
+        </ul>
     </section>
 
 </div>

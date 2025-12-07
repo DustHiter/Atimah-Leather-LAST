@@ -1,0 +1,325 @@
+/*
+ * Dark & Luxury Theme
+ * Palette: Black, Gray, Custom Blue
+ * Font: Vazirmatn
+ */
+
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
+:root {
+    /* Color Palette */
+    --color-dark-bg: #111111; /* پس‌زمینه اصلی (مشکی) */
+    --color-surface: #1f2326; /* پس‌زمینه بخش‌ها (خاکستری تیره‌تر) */
+    --color-card-bg: #2a2f34; /* پس‌زمینه کارت‌ها */
+    --color-border: #333333; /* رنگ جداکننده‌ها و حاشیه‌ها */
+    --color-gold: #e5b56e; /* رنگ شاخص (طلایی سفارشی) */
+    --color-gold-hover: #e9bc7e; /* رنگ هاور طلایی سفارشی */
+
+    /* Text Colors */
+    --color-text-primary: #F5F5F5; /* متن اصلی (سفید دودی) */
+    --color-text-secondary: #E0E0E0; /* متن ثانویه (خاکستری روشن) */
+    
+    /* Bootstrap Overrides */
+    --bs-body-bg: var(--color-dark-bg);
+    --bs-body-color: var(--color-text-primary);
+    --bs-border-color: var(--color-border);
+    --bs-primary: var(--color-gold);
+    --bs-primary-rgb: 229, 181, 110;
+
+    /* Spacing */
+    --section-padding-lg: 6rem;
+    --section-padding-md: 4rem;
+}
+
+/* --- Base & Typography --- */
+body {
+    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    direction: rtl;
+    text-align: right;
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700; /* فونت ضخیم‌تر برای عناوین */
+    color: var(--color-text-primary);
+}
+
+a {
+    color: var(--color-gold);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--color-gold-hover);
+}
+
+/* --- Layout & Spacing --- */
+
+.section-padding {
+    padding-top: var(--section-padding-md);
+    padding-bottom: var(--section-padding-md);
+}
+
+@media (min-width: 992px) {
+    .section-padding {
+        padding-top: var(--section-padding-lg);
+        padding-bottom: var(--section-padding-lg);
+    }
+}
+
+.section-title {
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--color-gold);
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* For right-aligned titles */
+.text-md-end .section-title::after,
+.text-end .section-title::after {
+    left: auto;
+    right: 0;
+    transform: none;
+}
+
+
+/* --- Page Specific --- */
+
+/* Hero Section */
+.hero-section .hero-title {
+    font-weight: 800;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+
+.hero-section .hero-subtitle {
+    text-shadow: 0 2px 15px rgba(0,0,0,0.5);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* About Us Section */
+.about-us-image {
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    transition: transform 0.4s ease;
+}
+.about-us-image:hover {
+    transform: scale(1.03);
+}
+
+
+/* --- General Components --- */
+
+.card {
+    background-color: var(--color-card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px; /* کمی گردتر */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.5);
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+}
+
+.card.card-static:hover {
+    transform: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); /* Keep original shadow */
+    border-color: rgba(255, 255, 255, 0.05); /* Keep original border */
+}
+
+
+
+.card-header, .card-footer {
+     background-color: rgba(0,0,0,0.1);
+     border-bottom: 1px solid var(--color-border);
+}
+
+.btn-primary {
+    background-color: var(--color-gold);
+    border-color: var(--color-gold);
+    color: #111; /* رنگ متن تیره برای کنتراست روی دکمه طلایی */
+    font-weight: 600;
+    padding: 10px 25px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--color-gold-hover);
+    border-color: var(--color-gold-hover);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(218, 165, 32, 0.2);
+}
+
+.form-control {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-gold);
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+}
+
+/* --- Utilities --- */
+.text-gold {
+    color: var(--color-gold) !important;
+}
+
+.text-muted {
+    color: #bbbbbb !important;
+}
+
+.bg-surface {
+    background-color: var(--color-surface) !important;
+}
+
+/* --- Header --- */
+.site-header {
+    background-color: rgba(17, 17, 17, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.site-header.header-scrolled {
+    border-color: var(--color-border);
+}
+
+.site-header .navbar-brand {
+    color: var(--color-gold);
+}
+
+.site-header .nav-link {
+    color: var(--color-text-secondary);
+    transition: color 0.3s ease;
+}
+
+.site-header .nav-link:hover, .site-header .nav-link.active {
+    color: var(--color-gold);
+}
+
+.navbar-toggler {
+    border-color: rgba(var(--bs-primary-rgb), 0.5) !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(229, 181, 110, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+
+/* --- Product Card --- */
+.product-card {
+    /* This class is a specific implementation of the .card component. */
+    /* It inherits border, background, shadow, etc. from .card */
+    padding: 0; /* Remove card-body padding if any is added globally */
+}
+
+/* The hover effect for product-card is slightly different, so we override the transform */
+.product-card:hover {
+    transform: translateY(-8px); /* Keep the slightly larger lift */
+}
+
+.product-card .product-image {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+}
+
+.product-card .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* پوشش کامل کادر بدون تغییر نسبت */
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.08); /* افکت زوم روی هاور */
+}
+
+.product-card .product-info {
+    padding: 1.5rem 0.5rem;
+}
+
+.product-card .product-title a {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+.product-card .product-price {
+    color: var(--color-gold);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+/* --- Footer --- */
+.site-footer {
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+}
+
+.site-footer h5 {
+    color: var(--color-gold);
+}
+
+.site-footer p,
+.site-footer .text-white-50 {
+    color: var(--color-text-secondary) !important;
+}
+
+.site-footer a,
+.site-footer a.text-white-50 {
+    color: var(--color-text-secondary) !important;
+    transition: color 0.3s ease;
+}
+
+.site-footer a:hover {
+    color: var(--color-gold) !important;
+}
+
+.site-footer .social-icon {
+    font-size: 1.5rem;
+    color: var(--color-text-secondary);
+    transition: color 0.3s ease;
+}
+
+.site-footer .social-icon:hover {
+    color: var(--color-gold);
+}

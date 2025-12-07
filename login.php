@@ -20,7 +20,7 @@ $page_title = "ورود یا ثبت‌نام";
     <!-- Remixicon -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <!-- Main Custom CSS (for variables) -->
-    <link rel="stylesheet" href="assets/css/dark_luxury.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="assets/css/theme.css?v=<?= time(); ?>">
 </head>
 <body class="dark-luxury">
 

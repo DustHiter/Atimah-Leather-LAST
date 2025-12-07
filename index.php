@@ -35,7 +35,7 @@ require_once 'db/config.php';
 
 
 <!-- Featured Products Section -->
-<section id="featured-products" class="py-5">
+<section id="featured-products" class="section-padding">
     <div class="container">
         <?php
         if (isset($_SESSION['success_message'])) {
@@ -47,7 +47,7 @@ require_once 'db/config.php';
             unset($_SESSION['error_message']);
         }
         ?>
-        <div class="section-title text-center mb-5" data-aos="fade-up">
+        <div class="section-title text-center" data-aos="fade-up">
             <h1>مجموعه برگزیده ما</h1>
             <p class="fs-5 text-muted">دست‌چین شده برای سلیقه‌های خاص.</p>
         </div>
@@ -96,18 +96,18 @@ require_once 'db/config.php';
 </section>
 
 <!-- About Us Section -->
-<section id="about-us" class="py-5">
+<section id="about-us" class="section-padding bg-surface">
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-md-6" data-aos="fade-right">
                 <img src="<?= htmlspecialchars($about_us_image_url) ?>" alt="درباره ما" class="about-us-image img-fluid">
             </div>
             <div class="col-md-6" data-aos="fade-left">
-                <div class="section-title text-md-end text-center">
+                <div class="section-title text-md-end text-start">
                      <h1>داستان آتیمه</h1>
                 </div>
-                <p class="text-muted fs-5 mt-3 text-md-end text-center">ما در آتیمه، به تلفیق هنر سنتی و طراحی مدرن باور داریم. هر محصول، حاصل ساعت‌ها کار دست هنرمندان ماهر و استفاده از بهترین چرم‌های طبیعی است. هدف ما خلق آثاری است که نه تنها یک وسیله، بلکه بخشی از داستان و استایل شما باشند.</p>
-                <div class="text-md-end text-center">
+                <p class="text-muted fs-5 mt-3 text-md-end text-start">ما در آتیمه، به تلفیق هنر سنتی و طراحی مدرن باور داریم. هر محصول، حاصل ساعت‌ها کار دست هنرمندان ماهر و استفاده از بهترین چرم‌های طبیعی است. هدف ما خلق آثاری است که نه تنها یک وسیله، بلکه بخشی از داستان و استایل شما باشند.</p>
+                <div class="text-md-end text-start">
                     <a href="about.php" class="btn btn-primary mt-3" data-aos="fade-up" data-aos-delay="200">بیشتر بدانید</a>
                 </div>
             </div>

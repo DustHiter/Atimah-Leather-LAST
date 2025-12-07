@@ -68,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div class="card">
     <div class="card-body">
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr><th>شماره</th><th>نام مشتری</th><th>مبلغ کل</th><th>وضعیت</th><th>تاریخ</th><th style="text-align: left;">عملیات</th></tr>
             </thead>
@@ -91,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 
@@ -111,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong>تلفن:</strong> <?php echo htmlspecialchars($order['billing_phone']); ?></p>
             <hr style="border-color: var(--admin-border);">
             <h6>محصولات</h6>
+            <div class="table-responsive">
             <table class="table items-list">
                 <thead>
                     <tr>
@@ -137,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
              <hr style="border-color: var(--admin-border);">
              <h5 style="text-align: left;">مبلغ نهایی: <?php echo number_format($order['total_amount']); ?> تومان</h5>
         </div>

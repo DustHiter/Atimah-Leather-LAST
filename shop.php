@@ -15,9 +15,9 @@ try {
 }
 ?>
 
-<main class="container py-5">
-    <div class="section-title text-center mb-5" data-aos="fade-down">
-        <h1>مجموعه کامل محصولات</h1>
+<main class="container section-padding">
+    <div class="text-center" data-aos="fade-down">
+        <h1 class="section-title">مجموعه کامل محصولات</h1>
         <p class="fs-5 text-muted">دست‌سازه‌هایی از چرم طبیعی، با عشق و دقت.</p>
     </div>
 
@@ -32,13 +32,13 @@ try {
             <p class="text-center text-muted fs-4">در حال حاضر محصولی برای نمایش وجود ندارد.</p>
         </div>
     <?php else: ?>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 g-lg-5">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 g-lg-5 mt-5">
             <?php 
             $delay = 0;
             foreach ($products as $product): 
             ?>
                 <div class="col" data-aos="fade-up" data-aos-delay="<?= $delay ?>">
-                    <div class="product-card h-100">
+                    <div class="card product-card h-100">
                         <div class="product-image">
                             <a href="product.php?id=<?= htmlspecialchars($product['id']) ?>">
                                 <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">

@@ -132,5 +132,120 @@ if ($action === 'get_stats') {
     exit;
 }
 
+if ($action === 'get_reports_data') {
+    try {
+        // 1. General Stats
+        $stats_query = "
+            SELECT
+                (SELECT SUM(total_amount) FROM orders WHERE status = 'Delivered') as total_revenue,
+                (SELECT COUNT(*) FROM orders) as total_orders,
+                (SELECT COUNT(*) FROM users WHERE is_admin = 0) as total_users,
+                (SELECT COUNT(*) FROM products) as total_products
+        ";
+        $stats_stmt = $pdo->query($stats_query);
+        $stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 2. Recent Orders
+        $recent_orders_query = "
+            SELECT o.id, o.total_amount, o.status, COALESCE(CONCAT(u.first_name, ' ', u.last_name), o.billing_name) AS customer_display_name
+            FROM orders o
+            LEFT JOIN users u ON o.user_id = u.id
+            ORDER BY o.created_at DESC
+            LIMIT 5
+        ";
+        $recent_orders_stmt = $pdo->query($recent_orders_query);
+        $recent_orders = $recent_orders_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 3. Top Selling Products (Calculated in PHP)
+        $orders_for_products_query = "SELECT items_json FROM orders WHERE status = 'Delivered'";
+        $orders_for_products_stmt = $pdo->query($orders_for_products_query);
+        $all_orders_items = $orders_for_products_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $product_sales = [];
+        foreach ($all_orders_items as $order_items) {
+            $items = json_decode($order_items['items_json'], true);
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    if (isset($item['name']) && isset($item['quantity'])) {
+                        $product_name = $item['name'];
+                        $quantity = (int)$item['quantity'];
+                        if (!isset($product_sales[$product_name])) {
+                            $product_sales[$product_name] = 0;
+                        }
+                        $product_sales[$product_name] += $quantity;
+                    }
+                }
+            }
+        }
+
+        arsort($product_sales);
+        $top_products = [];
+        $count = 0;
+        foreach ($product_sales as $name => $total_sold) {
+            $top_products[] = ['name' => $name, 'total_sold' => $total_sold];
+            $count++;
+            if ($count >= 5) break;
+        }
+
+        echo json_encode([
+            'stats' => [
+                'total_revenue' => (float)($stats['total_revenue'] ?? 0),
+                'total_orders' => (int)($stats['total_orders'] ?? 0),
+                'total_users' => (int)($stats['total_users'] ?? 0),
+                'total_products' => (int)($stats['total_products'] ?? 0),
+            ],
+            'recent_orders' => $recent_orders,
+            'top_products' => $top_products
+        ]);
+
+    } catch (PDOException $e) {
+        http_response_code(500);
+        error_log("API Error (get_reports_data): " . $e->getMessage());
+        echo json_encode(['error' => 'Database error while fetching report data.']);
+    }
+    exit;
+}
+
+if ($action === 'get_monthly_sales') {
+    require_once __DIR__ . '/../includes/jdf.php';
+    try {
+        $stmt = $pdo->prepare("
+            SELECT 
+                YEAR(created_at) as year, 
+                MONTH(created_at) as month, 
+                SUM(total_amount) as total_sales
+            FROM orders
+            WHERE status = 'Delivered'
+            GROUP BY year, month
+            ORDER BY year ASC, month ASC
+        ");
+        $stmt->execute();
+        $sales_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $labels = [];
+        $values = [];
+        $jalali_months = [
+            1 => 'فروردین', 2 => 'اردیبهشت', 3 => 'خرداد',
+            4 => 'تیر', 5 => 'مرداد', 6 => 'شهریور',
+            7 => 'مهر', 8 => 'آبان', 9 => 'آذر',
+            10 => 'دی', 11 => 'بهمن', 12 => 'اسفند'
+        ];
+
+        foreach ($sales_data as $row) {
+            $jalali_date = gregorian_to_jalali($row['year'], $row['month'], 1);
+            $labels[] = $jalali_months[(int)$jalali_date[1]] . ' ' . $jalali_date[0];
+            $values[] = (float)$row['total_sales'];
+        }
+        
+        echo json_encode(['labels' => $labels, 'values' => $values]);
+
+    } catch (PDOException $e) {
+        http_response_code(500);
+        error_log("API Error (get_monthly_sales): " . $e->getMessage());
+        echo json_encode(['error' => 'Database error while fetching monthly sales.']);
+    }
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['error' => 'Invalid action']);

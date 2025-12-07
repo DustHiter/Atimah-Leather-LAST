@@ -3,111 +3,88 @@ $page_title = 'داشبورد';
 require_once __DIR__ . '/header.php';
 ?>
 
-
-
-
 <div class="admin-header">
     <h1><?php echo $page_title; ?></h1>
 </div>
 
-<div id="dashboard-error" class="card d-none" style="color: var(--admin-danger);"><div class="card-body"></div></div>
+<div class="tabs">
+    <div class="tab-links">
+        <a href="#reports" class="tab-link active">گزارشات</a>
+        <a href="#settings" class="tab-link">تنظیمات</a>
+    </div>
+    <div class="tab-content">
+        <div id="reports" class="tab-pane active">
+            <h3>گزارشات فروش</h3>
+            <div class="stat-cards-grid-reports">
+                <div class="stat-card-report">
+                    <p>مجموع فروش (تکمیل شده)</p>
+                    <h3 id="total-sales">...</h3>
+                </div>
+                <div class="stat-card-report">
+                    <p>مجموع کاربران</p>
+                    <h3 id="total-users">...</h3>
+                </div>
+                <div class="stat-card-report">
+                    <p>سفارشات در حال پردازش</p>
+                    <h3 id="processing-orders">...</h3>
+                </div>
+            </div>
 
-<div class="dashboard-container">
-    <div class="stat-cards-grid-reports">
-        <div class="stat-card">
-            <div class="icon-container" style="background-color: #28a74555;"><i class="fas fa-dollar-sign" style="color: #28a745;"></i></div>
-            <div class="stat-info">
-                <p>مجموع فروش (تحویل شده)</p>
-                <h3 id="total-sales">...</h3>
+            <div class="card" style="margin-top: 2rem;">
+                <h5>نمودار فروش ماهانه (سفارشات تحویل شده)</h5>
+                <div style="height: 350px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="icon-container" style="background-color: #17a2b855;"><i class="fas fa-users" style="color: #17a2b8;"></i></div>
-            <div class="stat-info">
-                <p>مجموع کاربران</p>
-                <h3 id="total-users">...</h3>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-container" style="background-color: #007bff55;"><i class="fas fa-truck" style="color: #007bff;"></i></div>
-            <div class="stat-info">
-                <p>سفارشات در حال ارسال</p>
-                <h3 id="shipped-orders">...</h3>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-container" style="background-color: #dc354555;"><i class="fas fa-times-circle" style="color: #dc3545;"></i></div>
-            <div class="stat-info">
-                <p>سفارشات لغو شده</p>
-                <h3 id="cancelled-orders">...</h3>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-container" style="background-color: #ffc10755;"><i class="fas fa-spinner" style="color: #ffc107;"></i></div>
-            <div class="stat-info">
-                <p>سفارشات در حال پردازش</p>
-                <h3 id="processing-orders">...</h3>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="icon-container" style="background-color: #6f42c155;"><i class="fas fa-eye" style="color: #6f42c1;"></i></div>
-            <div class="stat-info">
-                <p>کل بازدید صفحات</p>
-                <h3 id="total-page-views">...</h3>
-            </div>
+        <div id="settings" class="tab-pane">
+            <h3>تنظیمات</h3>
+            <p>این بخش برای تنظیمات آینده در نظر گرفته شده است.</p>
         </div>
     </div>
-
-
-<div class="chart-container" style="position: relative; height:40vh; max-height: 450px;">
-    <h5>نمودار فروش ماهانه (سفارشات تحویل شده)</h5>
-    <canvas id="salesChart"></canvas>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const errorDiv = document.getElementById('dashboard-error');
-    const errorBody = errorDiv.querySelector('.card-body');
+    // Tab functionality
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabPanes = document.querySelectorAll('.tab-pane');
 
-    function showError(message) {
-        errorBody.textContent = message;
-        errorDiv.classList.remove('d-none');
-    }
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
 
-    // Fetch all data in parallel for faster loading
+            tabLinks.forEach(l => l.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+
+            this.classList.add('active');
+            document.querySelector(targetId).classList.add('active');
+        });
+    });
+
+    // Fetch data for stats and chart
     Promise.all([
-        fetch('api.php?action=get_stats').then(res => res.json()),
-        fetch('api.php?action=get_sales_data').then(res => res.json())
+        fetch('api.php?action=get_stats').then(res => res.ok ? res.json() : Promise.reject('Failed to load stats')),
+        fetch('api.php?action=get_sales_data').then(res => res.ok ? res.json() : Promise.reject('Failed to load sales data'))
     ]).then(([statsData, salesData]) => {
-
-        // Handle stats data
-        if (statsData.error) throw new Error(`آمار: ${statsData.error}`);
+        if (statsData.error) throw new Error(statsData.error);
         document.getElementById('total-sales').textContent = new Intl.NumberFormat('fa-IR').format(statsData.total_sales) + ' تومان';
         document.getElementById('total-users').textContent = statsData.total_users;
-        document.getElementById('shipped-orders').textContent = statsData.shipped_orders;
-        document.getElementById('cancelled-orders').textContent = statsData.cancelled_orders;
         document.getElementById('processing-orders').textContent = statsData.processing_orders;
-        document.getElementById('total-page-views').textContent = statsData.total_page_views.count;
 
-        // Handle sales chart data
-        if (salesData.error) throw new Error(`نمودار فروش: ${salesData.error}`);
+        if (salesData.error) throw new Error(salesData.error);
         renderSalesChart(salesData.labels, salesData.data);
 
     }).catch(error => {
-        console.error(`خطا:`, error);
-        showError(`خطا در بارگذاری گزارشات: ${error.message}`);
+        console.error('Dashboard Error:', error);
+        const reportsTab = document.getElementById('reports');
+        reportsTab.innerHTML = `<div style="color: #F44336; padding: 2rem; text-align: center;">خطا در بارگذاری داده‌های داشبورد. لطفاً بعداً تلاش کنید.</div>`;
     });
 
     function renderSalesChart(labels, data) {
         const ctx = document.getElementById('salesChart').getContext('2d');
-        const style = getComputedStyle(document.body);
-        
-        // Use a more vibrant and visible color for the chart
-        const chartColor = '#FFD700'; // A nice gold color
-
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, `${chartColor}60`); // 40% opacity
-        gradient.addColorStop(1, `${chartColor}00`); // 0% opacity
+        const primaryColor = getComputedStyle(document.body).getPropertyValue('--admin-primary').trim();
 
         new Chart(ctx, {
             type: 'line',
@@ -116,60 +93,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'میزان فروش',
                     data: data,
-                    backgroundColor: gradient,
-                    borderColor: chartColor,
-                    borderWidth: 3,
-                    fill: 'start',
-                    tension: 0.4, // Makes the line curvy
-                    pointBackgroundColor: chartColor,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBorderColor: style.getPropertyValue('--admin-bg').trim(),
-                    pointBorderWidth: 2,
+                    backgroundColor: `${primaryColor}33`, // 20% opacity
+                    borderColor: primaryColor,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: style.getPropertyValue('--admin-surface').trim(),
-                        titleColor: style.getPropertyValue('--admin-text').trim(),
-                        bodyColor: style.getPropertyValue('--admin-text-muted').trim(),
-                        titleFont: { family: 'Vazirmatn', size: 14, weight: 'bold' },
-                        bodyFont: { family: 'Vazirmatn', size: 12 },
-                        padding: 12,
-                        cornerRadius: 8,
-                        displayColors: false,
-                        callbacks: {
-                            label: (context) => `مجموع فروش: ${new Intl.NumberFormat('fa-IR').format(context.parsed.y)} تومان`
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: style.getPropertyValue('--admin-text-muted').trim(),
-                            font: { family: 'Vazirmatn', size: 12 }
-                        }
-                    },
+                 scales: {
                     y: {
-                        grid: {
-                            color: style.getPropertyValue('--admin-border').trim(),
-                            drawBorder: false,
-                        },
-                        ticks: {
-                            color: style.getPropertyValue('--admin-text-muted').trim(),
-                            font: { family: 'Vazirmatn', size: 12 },
-                            padding: 10,
-                            callback: (value) => new Intl.NumberFormat('fa-IR', { notation: 'compact' }).format(value)
-                        },
                         beginAtZero: true
                     }
                 }

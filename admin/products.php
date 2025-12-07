@@ -25,7 +25,8 @@ if ($flash_message) {
 
 <div class="card">
     <div class="card-body">
-        <table class="table">
+        <div class="table-responsive">
+            <table class="table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -52,6 +53,7 @@ if ($flash_message) {
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 

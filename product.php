@@ -46,51 +46,54 @@ if (!empty($product['colors'])) {
 
 ?>
 
-<main class="container py-5">
+<main class="container section-padding">
     <div class="row g-5">
         <div class="col-lg-6" data-aos="fade-right">
-            <div class="product-image-gallery">
-                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="img-fluid" alt="<?php echo htmlspecialchars($product['name']); ?>">
+            <div class="card card-static p-3">
+                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="img-fluid rounded" alt="<?php echo htmlspecialchars($product['name']); ?>">
             </div>
         </div>
 
-        <div class="col-lg-6 product-details" data-aos="fade-left">
-            <h1 class="display-5 fw-bold mb-3"><?php echo htmlspecialchars($product['name']); ?></h1>
+        <div class="col-lg-6" data-aos="fade-left">
+            <div class="card h-100">
+                <div class="card-body p-4 p-lg-5">
+                    <h1 class="display-5 fw-bold mb-3"><?php echo htmlspecialchars($product['name']); ?></h1>
             
-            <div class="d-flex align-items-center mb-4">
-                <p class="display-6 fw-bold m-0"><?php echo number_format($product['price']); ?> تومان</p>
-            </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <p class="display-6 fw-bold m-0"><?php echo number_format($product['price']); ?> تومان</p>
+                    </div>
 
-            <p class="fs-5 mb-4 text-muted"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+                    <p class="fs-5 mb-4 text-muted"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
 
-            <form action="cart_handler.php" method="POST">
-                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                <input type="hidden" name="action" value="add">
+                    <form action="cart_handler.php" method="POST" class="mt-auto">
+                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                        <input type="hidden" name="action" value="add">
 
-                <?php if (!empty($available_colors)): ?>
-                    <div class="mb-4">
-                        <h5 class="mb-3">انتخاب رنگ:</h5>
-                        <div class="color-swatches">
-                            <?php foreach ($available_colors as $index => $color_hex): ?>
-                                <input type="radio" class="btn-check" name="product_color" id="color_<?php echo $index; ?>" value="<?php echo htmlspecialchars($color_hex); ?>" autocomplete="off" <?php echo (count($available_colors) === 1) ? 'checked' : ''; ?>/>
-                                <label class="btn" for="color_<?php echo $index; ?>" style="background-color: <?php echo htmlspecialchars($color_hex); ?>;"></label>
-                            <?php endforeach; ?>
+                        <?php if (!empty($available_colors)): ?>
+                            <div class="mb-4">
+                                <h5 class="mb-3">انتخاب رنگ:</h5>
+                                <div class="color-swatches">
+                                    <?php foreach ($available_colors as $index => $color_hex): ?>
+                                        <input type="radio" class="btn-check" name="product_color" id="color_<?php echo $index; ?>" value="<?php echo htmlspecialchars($color_hex); ?>" autocomplete="off" <?php echo (count($available_colors) === 1) ? 'checked' : ''; ?>/>
+                                        <label class="btn" for="color_<?php echo $index; ?>" style="background-color: <?php echo htmlspecialchars($color_hex); ?>;"></label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="row align-items-center mb-4">
+                            <div class="col-md-5 col-lg-4 quantity-input-wrapper">
+                                 <label for="quantity" class="form-label fw-bold">تعداد:</label>
+                                <input type="number" name="quantity" id="quantity" class="form-control quantity-input text-center" value="1" min="1" max="10">
+                            </div>
                         </div>
-                    </div>
-                <?php endif; ?>
 
-                <div class="row align-items-center mb-4">
-                    <div class="col-md-5 col-lg-4 quantity-input-wrapper">
-                         <label for="quantity" class="form-label fw-bold">تعداد:</label>
-                        <input type="number" name="quantity" id="quantity" class="form-control quantity-input text-center" value="1" min="1" max="10">
-                    </div>
+                        <div class="d-grid gap-2 add-to-cart-btn">
+                            <button type="submit" class="btn btn-primary"><i class="ri-shopping-bag-add-line"></i> افزودن به سبد خرید</button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="d-grid gap-2 add-to-cart-btn">
-                    <button type="submit" class="btn btn-primary"><i class="ri-shopping-bag-add-line"></i> افزودن به سبد خرید</button>
-                </div>
-            </form>
-
+            </div>
         </div>
     </div>
 </main>
