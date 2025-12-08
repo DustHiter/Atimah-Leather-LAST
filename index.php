@@ -11,17 +11,18 @@ require_once 'db/config.php';
 ?>
 
 <!-- Hero Section -->
-<section class="hero-section vh-100 d-flex align-items-center">
-    <div class="video-background-wrapper">
-        <div class="video-overlay"></div>
-        <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
-            <source src="https://static.pexels.com/lib/videos/free-videos.mp4" type="video/mp4">
+<section class="hero-section vh-100 d-flex justify-content-center align-items-center position-relative text-white text-center">
+    <div class="hero-video-background">
+        <video playsinline autoplay muted loop poster="assets/images/pexels/about-us-34942790.jpg">
+            <source src="https://videos.pexels.com/video-files/8065365/8065365-hd_1920_1080_25fps.mp4" type="video/mp4">
+            ویدیوی شما توسط مرورگر پشتیبانی نمی‌شود.
         </video>
+        <div class="hero-video-overlay"></div>
     </div>
-    <div class="container position-relative text-center">
-        <h1 class="display-3 hero-title" data-aos="zoom-in-out" data-aos-delay="100">اصالت در هر نگاه</h1>
-        <p class="lead fs-4 mb-4 hero-subtitle" data-aos="fade-up" data-aos-delay="300">محصولات چرمی دست‌دوز، آفریده برای ماندگاری.</p>
-        <a href="shop.php" class="btn btn-primary btn-lg" data-aos="fade-up" data-aos-delay="500">کاوش در مجموعه</a>
+    <div class="container position-relative">
+        <h1 class="display-3 fw-bold" data-aos="fade-down">اصالت در هر نگاه</h1>
+        <p class="lead fs-4 mb-4" data-aos="fade-up" data-aos-delay="200">محصولات چرمی دست‌دوز، آفریده برای ماندگاری.</p>
+        <a href="shop.php" class="btn btn-primary btn-lg" data-aos="fade-up" data-aos-delay="400">مشاهده محصولات</a>
     </div>
 </section>
 
