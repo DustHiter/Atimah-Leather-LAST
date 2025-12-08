@@ -30,9 +30,14 @@ function handle_send_otp() {
     }
 
     $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-    if (!$email) {
-        flash_message('danger', 'لطفاً یک آدرس ایمیل معتبر وارد کنید.', 'login.php');
+    $phone = preg_match('/^09[0-9]{9}$/', trim($_POST['phone'] ?? '')) ? trim($_POST['phone']) : null;
+    
+    if (!$email && !$phone) {
+        flash_message('danger', 'لطفاً یک ایمیل یا شماره تلفن معتبر وارد کنید.', 'login.php');
     }
+
+    $identifier = $email ?: $phone;
+    $login_method = $email ? 'email' : 'phone';
 
     try {
         $pdo = db();
@@ -44,23 +49,31 @@ function handle_send_otp() {
         // OTP is valid for 10 minutes
         $expires_at = date('Y-m-d H:i:s', time() + (10 * 60));
 
-        // Store the hashed code in the database
+        // Store the hashed code in the database. Using the 'email' column for both for now.
         $stmt = $pdo->prepare("INSERT INTO otp_codes (email, code_hash, expires_at) VALUES (?, ?, ?)");
-        $stmt->execute([$email, $code_hash, $expires_at]);
+        $stmt->execute([$identifier, $code_hash, $expires_at]);
 
-        // Send the plain code to the user's email
-        $subject = "کد ورود شما به فروشگاه آتیمه";
-        $body = "<div dir='rtl' style='font-family: Vazirmatn, sans-serif; text-align: right;'><h2>کد تایید شما</h2><p>برای ورود یا ثبت‌نام در وب‌سایت آتیمه، از کد زیر استفاده کنید:</p><p style='font-size: 24px; font-weight: bold; letter-spacing: 5px; text-align: center; background: #f0f0f0; padding: 10px; border-radius: 8px;'>{$otp_code}</p><p>این کد تا ۱۰ دقیقه دیگر معتبر است.</p></div>";
-        
-        $mail_result = MailService::sendMail($email, $subject, $body);
+        if ($login_method === 'email') {
+            // Send the plain code to the user's email
+            $subject = "کد ورود شما به فروشگاه آتیمه";
+            $body = "<div dir='rtl' style='font-family: Vazirmatn, sans-serif; text-align: right;'><h2>کد تایید شما</h2><p>برای ورود یا ثبت‌نام در وب‌سایت آتیمه، از کد زیر استفاده کنید:</p><p style='font-size: 24px; font-weight: bold; letter-spacing: 5px; text-align: center; background: #f0f0f0; padding: 10px; border-radius: 8px;'>{$otp_code}</p><p>این کد تا ۱۰ دقیقه دیگر معتبر است.</p></div>";
+            
+            $mail_result = MailService::sendMail($identifier, $subject, $body);
 
-        if (!$mail_result['success']) {
-            error_log('OTP Mail Error: ' . ($mail_result['error'] ?? 'Unknown error'));
-            flash_message('danger', 'خطایی در ارسال ایمیل رخ داد. لطفاً مطمئن شوید ایمیل را درست وارد کرده‌اید.', 'login.php');
+            if (!$mail_result['success']) {
+                error_log('OTP Mail Error: ' . ($mail_result['error'] ?? 'Unknown error'));
+                flash_message('danger', 'خطایی در ارسال ایمیل رخ داد. لطفاً مطمئن شوید ایمیل را درست وارد کرده‌اید.', 'login.php');
+            }
+        } else {
+            // Phone login: Simulate sending OTP since there is no SMS gateway
+            error_log("OTP for {$identifier}: {$otp_code}"); // Log for debugging
+            // In a real application, you would integrate with an SMS service here.
+            // For now, we will show a message that it's not implemented, but allow verification for testing.
+             $_SESSION['show_otp_for_debugging'] = $otp_code; // Temporarily show OTP on verify page for testing
         }
 
-        // Store email in session to use on the verification page
-        $_SESSION['otp_email'] = $email;
+        // Store identifier in session to use on the verification page
+        $_SESSION['otp_identifier'] = $identifier;
         header('Location: verify.php');
         exit;
 
@@ -76,19 +89,21 @@ function handle_verify_otp() {
         exit;
     }
 
-    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    $identifier = trim($_POST['identifier'] ?? '');
     $otp_code = trim($_POST['otp_code'] ?? '');
 
-    if (!$email || !$otp_code) {
-        flash_message('danger', 'ایمیل یا کد تایید نامعتبر است.', 'login.php');
+    if (!$identifier || !$otp_code) {
+        flash_message('danger', 'شناسه یا کد تایید نامعتبر است.', 'login.php');
     }
+
+    $login_method = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
     try {
         $pdo = db();
         
-        // Find the latest, unused OTP for this email that has not expired
+        // Find the latest, unused OTP for this identifier that has not expired
         $stmt = $pdo->prepare("SELECT * FROM otp_codes WHERE email = ? AND is_used = 0 AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1");
-        $stmt->execute([$email]);
+        $stmt->execute([$identifier]);
         $otp_row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($otp_row && password_verify($otp_code, $otp_row['code_hash'])) {
@@ -97,32 +112,32 @@ function handle_verify_otp() {
             $stmt_update->execute([$otp_row['id']]);
 
             // Check if user exists
-            $stmt_user = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-            $stmt_user->execute([$email]);
+            $column = $login_method === 'email' ? 'email' : 'phone';
+            $stmt_user = $pdo->prepare("SELECT * FROM users WHERE $column = ?");
+            $stmt_user->execute([$identifier]);
             $user = $stmt_user->fetch(PDO::FETCH_ASSOC);
 
             $user_id = null;
             if ($user) {
                 // User exists, log them in
                 $user_id = $user['id'];
-                $_SESSION['user_name'] = $user['first_name']; // Might be null, that's ok
+                $_SESSION['user_name'] = $user['first_name'];
             } else {
                 // User does not exist, create a new one
-                $stmt_create = $pdo->prepare("INSERT INTO users (email, is_admin) VALUES (?, 0)");
-                $stmt_create->execute([$email]);
+                $stmt_create = $pdo->prepare("INSERT INTO users ($column, is_admin) VALUES (?, 0)");
+                $stmt_create->execute([$identifier]);
                 $user_id = $pdo->lastInsertId();
-                $_SESSION['user_name'] = null; // New user has no name yet
+                $_SESSION['user_name'] = null;
             }
             
             // Set session variables for login
             $_SESSION['user_id'] = $user_id;
-            unset($_SESSION['otp_email']); // Clean up session
+            unset($_SESSION['otp_identifier']);
+            unset($_SESSION['show_otp_for_debugging']);
             
-            // Redirect to homepage with success
             flash_message('success', 'شما با موفقیت وارد شدید!', 'index.php');
 
         } else {
-            // Invalid or expired OTP
             flash_message('danger', 'کد وارد شده اشتباه یا منقضی شده است.', 'verify.php');
         }
 
@@ -132,6 +147,7 @@ function handle_verify_otp() {
     }
 }
 
+
 function handle_logout() {
     session_unset();
     session_destroy();
@@ -140,9 +156,9 @@ function handle_logout() {
 }
 
 function flash_message($type, $message, $location) {
-    // Ensure email is carried over to verify page on error
-    if ($location === 'verify.php' && isset($_POST['email'])) {
-        $_SESSION['otp_email'] = $_POST['email'];
+    // Ensure identifier is carried over to verify page on error
+    if ($location === 'verify.php' && isset($_POST['identifier'])) {
+        $_SESSION['otp_identifier'] = $_POST['identifier'];
     }
     $_SESSION['flash_message'] = ['type' => $type, 'message' => $message];
     header("Location: $location");

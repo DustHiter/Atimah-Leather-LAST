@@ -1,12 +1,4 @@
 <?php 
-// DEBUG: Show session data right at the start
-echo '<div style="background-color: #ffc; padding: 10px; border: 1px solid #e2a000; margin-bottom: 20px;">';
-echo '<strong>Debug Info (index.php):</strong><br>';
-echo '<pre>';
-print_r($_SESSION);
-echo '</pre>';
-echo '</div>';
-
 $page_title = 'صفحه اصلی';
 include 'includes/header.php'; 
 
